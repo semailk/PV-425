@@ -5,14 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
+    private const PER_PAGE = 12;
+
+    public function index(Request $request)
     {
-        $products = Product::with('category')->paginate(15);
-        return view('products.index', compact('products'));
+        $sort = $request->get('sort', 'price');
+        $arrayOrderBy = explode('_', $sort);
+        $direction = last($arrayOrderBy) == 'asc' ? 'desc' : 'asc';
+        if (count($arrayOrderBy) > 1){
+            unset($arrayOrderBy[count($arrayOrderBy) - 1]);
+        }
+        $columnName = implode('_', $arrayOrderBy);
+
+        $products = Product::Filter($request)
+            ->orderBy($columnName, $direction)
+            ->paginate(self::PER_PAGE);
+
+        $categories = Category::OnlySubCategories()->get();
+
+        return view('products.index', [
+            'products' => $products,
+            'categories' => $categories
+        ]);
     }
 
     public function create()
@@ -39,10 +60,22 @@ class ProductController extends Controller
             $validated['image'] = 'storage/' . $imageName;
         }
 
-        Product::create($validated);
+        DB::beginTransaction();
+        try {
+            Product::create($validated);
 
-        return redirect()->route('products.index')
-            ->with('success', 'Продукт успешно создан!');
+            DB::commit();
+            return redirect()->route('products.index')
+                ->with('success', 'Продукт успешно создан!');
+        }catch (\Exception $exception){
+            DB::rollBack();
+            Log::critical($exception->getMessage());
+
+            if (File::exists($validated['image'])) {
+                File::delete($validated['image']);
+            }
+            return redirect()->back();
+        }
     }
 
     public function show(Product $product)
@@ -87,9 +120,9 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         // Удаляем изображение
-        if ($product->image && file_exists(public_path($product->image))) {
-            unlink(public_path($product->image));
-        }
+//        if ($product->image && file_exists(public_path($product->image))) {
+//            unlink(public_path($product->image));
+//        }
 
         $product->delete();
 

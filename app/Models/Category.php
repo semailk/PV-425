@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -13,10 +15,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property boolean $is_active
  * @property string $created_at
  * @property string $updated_at
+ * @method static Builder OnlySubCategories()
  */
 class Category extends Model
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
     protected $fillable = [
         'name',
         'is_active',
@@ -36,5 +39,10 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function scopeOnlySubCategories($query): Builder
+    {
+        return $query->whereNotNull('parent_id');
     }
 }

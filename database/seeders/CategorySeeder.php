@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -284,14 +285,12 @@ class CategorySeeder extends Seeder
 
             // Создаем сабкатегории
             foreach ($data['subcategories'] as $subName) {
-
-                Category::query()->updateOrCreate(
-                    ['name' => $subName],
-                    [
-                        'parent_id' => $parent->id,
-                        'is_active' => true,
-                    ]
-                );
+                Category::factory([
+                    'name' => $subName,
+                    'parent_id' => $parent->id,
+                ])
+                    ->has(Product::factory()->count(3), 'products')
+                    ->create();
             }
         }
     }
