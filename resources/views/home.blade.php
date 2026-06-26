@@ -1,195 +1,379 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-7xl mx-auto">
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
-                <div>
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-blue-100">
-                            📱
-                        </div>
-                        <div>
-                            <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Категории</h1>
-                            <p class="text-gray-500 text-lg">Управление категориями электроники</p>
+    <div class="container py-5">
+        <!-- Hero Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="bg-gradient-primary rounded-4 p-5 text-white position-relative overflow-hidden">
+                    <div class="position-absolute top-0 end-0 opacity-10 d-none d-md-block">
+                        <i class="bi bi-laptop fs-1" style="font-size: 15rem;"></i>
+                    </div>
+                    <div class="position-relative" style="z-index: 1;">
+                        <h1 class="display-4 fw-bold mb-3">Техника для жизни</h1>
+                        <p class="fs-5 mb-4 opacity-75" style="max-width: 500px;">
+                            Откройте мир современных технологий с лучшими брендами по выгодным ценам
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="#products" class="btn btn-light btn-lg rounded-3 px-4">
+                                <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                                Все товары
+                            </a>
+                            <a href="#" class="btn btn-outline-light btn-lg rounded-3 px-4">
+                                <i class="bi bi-tags me-2"></i>
+                                Акции
+                            </a>
                         </div>
                     </div>
-                </div>
-
-                <div class="mt-4 md:mt-0 flex items-center gap-4">
-                    <!-- Статистика -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-3 flex items-center gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Всего</div>
-                                <div class="text-2xl font-bold text-gray-900">{{ count($categories) }}</div>
-                            </div>
-                        </div>
-                        <div class="w-px h-10 bg-gray-200"></div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">Активных</div>
-                                <div class="text-2xl font-bold text-green-600">{{ count(array_filter($categories->toArray(), function($c) { return $c['is_active']; })) }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Кнопка добавления -->
-                    <button onclick="addNewCategory()"
-                            class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-2xl font-medium transition-all shadow-lg shadow-blue-200 flex items-center gap-2 whitespace-nowrap">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Добавить
-                    </button>
                 </div>
             </div>
+        </div>
 
-            @if(count($categories) > 0)
-                <!-- Сетка категорий -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    @foreach($categories as $category)
-                        <div class="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <!-- Цветная полоса сверху -->
-                            <div class="h-1.5 bg-gradient-to-r
-                                @if($category->is_active)
-                                    from-green-400 to-emerald-500
-                                @else
-                                    from-gray-300 to-gray-400
-                                @endif">
+        <!-- Filters & Search -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold text-muted small text-uppercase">
+                                    <i class="bi bi-search me-1"></i> Поиск
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg border-end-0"
+                                           placeholder="Найти товар..." id="searchInput">
+                                    <button class="btn btn-primary btn-lg" type="button">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted small text-uppercase">
+                                    <i class="bi bi-tag me-1"></i> Категория
+                                </label>
+                                <select class="form-select form-select-lg" id="categoryFilter">
+                                    <option value="">Все категории</option>
+                                    @foreach($categories ?? [] as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold text-muted small text-uppercase">
+                                    <i class="bi bi-arrow-up-down me-1"></i> Сортировка
+                                </label>
+                                <select class="form-select form-select-lg" id="sortFilter">
+                                    <option value="newest">Новинки</option>
+                                    <option value="price_asc">Цена ↑</option>
+                                    <option value="price_desc">Цена ↓</option>
+                                    <option value="popular">Популярные</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-secondary btn-lg w-100" type="button" id="resetFilters">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                    Сбросить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h4 fw-bold text-dark mb-0" id="products">
+                        <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+                        Товары
+                        <span class="badge bg-primary rounded-pill ms-2">{{ count($products) }}</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-sm btn-outline-secondary rounded-3" id="viewGrid" title="Сетка">
+                            <i class="bi bi-grid-3x3-gap-fill"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary rounded-3" id="viewList" title="Список">
+                            <i class="bi bi-list-ul"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if(count($products) > 0)
+            <!-- Products Grid View -->
+            <div class="row g-4" id="productsGrid">
+                @foreach($products as $product)
+                    <div class="col-lg-3 col-md-4 col-sm-6 product-card" data-category="{{ $product->category_id }}">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
+                            <!-- Product Image -->
+                            <div class="position-relative bg-light" style="height: 220px; overflow: hidden;">
+                                <img src="{{ asset($product->image) }}"
+                                     alt="{{ $product->name }}"
+                                     class="img-fluid w-100 h-100 object-fit-cover transition-all"
+                                     style="object-fit: cover;">
+
+                                <!-- Badges -->
+                                <div class="position-absolute top-0 start-0 p-2">
+                                    @if($product->created_at->diffInDays(now()) < 7)
+                                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                            <i class="bi bi-star-fill me-1"></i> Новинка
+                                        </span>
+                                    @endif
+                                    @if($product->price < 10000)
+                                        <span class="badge bg-danger rounded-pill px-3 py-2 ms-1">
+                                            <i class="bi bi-tags me-1"></i> Скидка
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <!-- Wishlist Button -->
+                                <button class="position-absolute top-0 end-0 m-2 btn btn-sm btn-white rounded-circle shadow-sm"
+                                        style="width: 36px; height: 36px; padding: 0;">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+
+                                <!-- Quick View Button -->
+                                <button class="position-absolute bottom-0 start-50 translate-middle-x mb-2 btn btn-dark btn-sm rounded-3 px-3 opacity-0-hover transition-all"
+                                        onclick="quickView({{ $product->id }})">
+                                    <i class="bi bi-eye me-1"></i> Быстрый просмотр
+                                </button>
                             </div>
 
-                            <div class="p-6">
-                                <!-- Верхняя часть с ID и статусом -->
-                                <div class="flex justify-between items-start mb-4">
-                                    <span class="text-xs font-mono bg-gray-50 text-gray-400 px-3 py-1 rounded-lg border border-gray-100">
-                                        #{{ str_pad($category->id, 3, '0', STR_PAD_LEFT) }}
-                                    </span>
+                            <div class="card-body p-3">
+                                <!-- Category Badge -->
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 mb-2">
+                                    <i class="bi bi-folder me-1"></i>
+                                    {{ $product->category->name ?? 'Без категории' }}
+                                </span>
 
-                                    <span class="px-3 py-1 text-xs font-medium rounded-full transition-all duration-300 flex items-center gap-1.5
-                                        @if($category->is_active)
-                                            bg-emerald-50 text-emerald-700
-                                            shadow-sm shadow-emerald-100
-                                        @else
-                                            bg-gray-100 text-gray-500
-                                        @endif">
-                                        <span class="w-1.5 h-1.5 rounded-full inline-block
-                                            @if($category->is_active) bg-emerald-500 @else bg-gray-400 @endif">
+                                <!-- Product Name -->
+                                <h5 class="card-title fw-semibold text-dark mb-2 text-truncate-2"
+                                    style="font-size: 1rem; height: 2.8rem;">
+                                    {{ $product->name }}
+                                </h5>
+
+                                <!-- Tags -->
+                                @if($product->tags->isNotEmpty())
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        @foreach($product->tags as $tag)
+                                            <span class="badge rounded-pill px-2 py-1" style="
+                                                background: {{ $tag->color ?? '#6c757d' }};
+                                                color: white;
+                                                font-size: 0.65rem;
+                                                font-weight: 500;
+                                                opacity: 0.9;
+                                            ">
+                                                <i class="bi bi-tag-fill me-1" style="font-size: 0.5rem;"></i>
+                                                {{ $tag->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- Rating -->
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="text-warning">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-half"></i>
+                                    </div>
+                                    <small class="text-muted">(128)</small>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    <div>
+                                        <span class="h5 fw-bold text-primary mb-0">
+                                            {{ number_format($product->price, 0, ',', ' ') }} ₽
                                         </span>
-                                        {{ $category->is_active ? 'Активна' : 'Неактивна' }}
-                                    </span>
-                                </div>
-
-                                <!-- Название категории с иконкой -->
-                                <div class="mb-4">
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center text-xl flex-shrink-0">
-                                            📂
-                                        </div>
-                                        <div>
-                                            <h3 class="text-lg font-semibold text-gray-800 line-clamp-2 leading-tight">
-                                                {{ $category->name }}
-                                            </h3>
-                                            @if(isset($category->slug))
-                                                <span class="text-xs text-gray-400 font-mono">/{{ $category->slug }}</span>
-                                            @endif
-                                        </div>
+                                        @if($product->price > 20000)
+                                            <span class="text-muted text-decoration-line-through ms-2 small">
+                                                {{ number_format($product->price * 1.2, 0, ',', ' ') }} ₽
+                                            </span>
+                                        @endif
                                     </div>
-                                </div>
-
-                                <!-- Дополнительная информация -->
-                                <div class="flex items-center justify-between pt-4 border-t border-gray-50">
-                                    <div class="flex items-center gap-1.5 text-sm text-gray-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span>{{ \Carbon\Carbon::parse($category->created_at)->format('d.m.Y') }}</span>
-                                    </div>
-
-                                    <!-- Действия -->
-                                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onclick="editCategory({{ $category->id }})"
-                                                class="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600 hover:text-blue-700"
-                                                title="Редактировать">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                            </svg>
-                                        </button>
-                                        <button onclick="deleteCategory({{ $category->id }})"
-                                                class="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-400 hover:text-red-600"
-                                                title="Удалить">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                        </button>
-                                    </div>
+                                    <button onclick="addToCart({{ $product->id }})"
+                                            class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 40px; height: 40px; padding: 0;">
+                                        <i class="bi bi-cart-plus fs-5"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-
-                <!-- Пагинация (если нужна) -->
-                @if(isset($categories) && method_exists($categories, 'links'))
-                    <div class="mt-12">
-                        {{ $categories->links() }}
                     </div>
-                @endif
+                @endforeach
+            </div>
 
-            @else
-                <!-- Пустое состояние -->
-                <div class="text-center py-20 bg-white rounded-3xl border border-gray-100">
-                    <div class="inline-block p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full mb-6">
-                        <div class="text-7xl">📦</div>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-3">Категории не найдены</h2>
-                    <p class="text-gray-500 max-w-sm mx-auto">
-                        В базе данных пока нет ни одной категории.<br>
-                        Начните с добавления первой!
-                    </p>
-                    <button onclick="addNewCategory()"
-                            class="mt-8 inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl font-medium transition-all shadow-lg shadow-blue-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Добавить категорию
-                    </button>
+            <!-- Pagination -->
+            @if(isset($products) && method_exists($products, 'links'))
+                <div class="mt-5 d-flex justify-content-center">
+                    {{ $products->links('pagination::bootstrap-5') }}
                 </div>
             @endif
+
+        @else
+            <!-- Empty State -->
+            <div class="text-center py-5 my-5">
+                <div class="bg-gradient-soft d-inline-block rounded-circle p-5 mb-4">
+                    <i class="bi bi-box-seam fs-1 text-primary" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-3">Товары не найдены</h3>
+                <p class="text-muted mx-auto" style="max-width: 400px;">
+                    В каталоге пока нет товаров. <br>
+                    Загляните позже или измените параметры поиска.
+                </p>
+                <button onclick="resetFilters()" class="btn btn-primary btn-lg rounded-3 shadow-sm px-5 mt-3">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>
+                    Сбросить фильтры
+                </button>
+            </div>
+        @endif
+    </div>
+
+    <!-- Quick View Modal -->
+    <div class="modal fade" id="quickViewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <img src="" alt="" class="img-fluid rounded-3" id="quickViewImage">
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="fw-bold mb-2" id="quickViewName">Название товара</h3>
+                            <div class="mb-3">
+                                <span class="badge bg-primary bg-opacity-10 text-primary" id="quickViewCategory">Категория</span>
+                            </div>
+
+                            <!-- Tags in Quick View -->
+                            <div class="mb-3" id="quickViewTags">
+                                <span class="badge bg-secondary rounded-pill px-2 py-1 me-1">
+                                    <i class="bi bi-tag-fill me-1"></i> Теги
+                                </span>
+                            </div>
+
+                            <p class="text-muted" id="quickViewDescription">Описание товара</p>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span class="h2 fw-bold text-primary mb-0" id="quickViewPrice">0 ₽</span>
+                                <span class="text-muted text-decoration-line-through" id="quickViewOldPrice">0 ₽</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary btn-lg flex-grow-1 rounded-3" onclick="addToCartFromQuickView()">
+                                    <i class="bi bi-cart-plus me-2"></i>
+                                    Добавить в корзину
+                                </button>
+                                <button class="btn btn-outline-secondary btn-lg rounded-3">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <style>
-        /* Анимация появления карточек */
-        .group {
-            animation: fadeInUp 0.5s ease-out forwards;
+        /* Custom Styles */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+        }
+
+        .bg-gradient-soft {
+            background: linear-gradient(135deg, #e7f1ff, #f0e7ff);
+        }
+
+        .hover-shadow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-shadow:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1.5rem 3rem rgba(0,0,0,.15) !important;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .opacity-0-hover {
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .opacity-0-hover {
+            opacity: 1;
+        }
+
+        .text-truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .btn-white {
+            background: white;
+            border: none;
+            color: #6c757d;
+        }
+
+        .btn-white:hover {
+            background: white;
+            color: #dc3545;
+            transform: scale(1.1);
+        }
+
+        /* Tag Animation */
+        .badge {
+            transition: all 0.2s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+            opacity: 1 !important;
+        }
+
+        /* Product Image Hover */
+        .product-card .card img {
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .card img {
+            transform: scale(1.05);
+        }
+
+        /* Animation */
+        .product-card {
+            animation: fadeInUp 0.6s ease-out forwards;
             opacity: 0;
         }
 
-        .group:nth-child(1) { animation-delay: 0.05s; }
-        .group:nth-child(2) { animation-delay: 0.1s; }
-        .group:nth-child(3) { animation-delay: 0.15s; }
-        .group:nth-child(4) { animation-delay: 0.2s; }
-        .group:nth-child(5) { animation-delay: 0.25s; }
-        .group:nth-child(6) { animation-delay: 0.3s; }
-        .group:nth-child(7) { animation-delay: 0.35s; }
-        .group:nth-child(8) { animation-delay: 0.4s; }
+        .product-card:nth-child(1) { animation-delay: 0.05s; }
+        .product-card:nth-child(2) { animation-delay: 0.1s; }
+        .product-card:nth-child(3) { animation-delay: 0.15s; }
+        .product-card:nth-child(4) { animation-delay: 0.2s; }
+        .product-card:nth-child(5) { animation-delay: 0.25s; }
+        .product-card:nth-child(6) { animation-delay: 0.3s; }
+        .product-card:nth-child(7) { animation-delay: 0.35s; }
+        .product-card:nth-child(8) { animation-delay: 0.4s; }
+        .product-card:nth-child(9) { animation-delay: 0.45s; }
+        .product-card:nth-child(10) { animation-delay: 0.5s; }
+        .product-card:nth-child(11) { animation-delay: 0.55s; }
+        .product-card:nth-child(12) { animation-delay: 0.6s; }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -197,65 +381,180 @@
             }
         }
 
-        /* Обрезка текста в 2 строки */
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        /* Плавный переход для статуса */
-        .status {
-            transition: all 0.3s ease;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
         }
 
-        /* Стили для пагинации (если используется) */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
         }
-        .pagination .page-item .page-link {
-            padding: 8px 16px;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            text-decoration: none;
-            transition: all 0.2s;
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
-        .pagination .page-item .page-link:hover {
-            background: #f3f4f6;
-            border-color: #d1d5db;
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .display-4 {
+                font-size: 2.2rem;
+            }
+
+            .bg-gradient-primary {
+                padding: 2rem !important;
+            }
+
+            .product-card .card img {
+                height: 180px !important;
+            }
         }
-        .pagination .page-item.active .page-link {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: white;
-        }
-        .pagination .page-item.disabled .page-link {
-            opacity: 0.5;
-            pointer-events: none;
+
+        /* Loader */
+        .loading-spinner {
+            display: none;
+            width: 3rem;
+            height: 3rem;
         }
     </style>
 
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <script>
-        function addNewCategory() {
-            // Заглушка для добавления
-            alert('Открыть форму добавления категории');
-        }
+        // Search functionality
+        document.getElementById('searchInput')?.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
 
-        function editCategory(id) {
-            // Заглушка для редактирования
-            alert('Редактирование категории #' + id);
-        }
+            cards.forEach(card => {
+                const name = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+                card.style.display = name.includes(query) ? '' : 'none';
+            });
+        });
 
-        function deleteCategory(id) {
-            // Заглушка для удаления
-            if (confirm('Вы уверены, что хотите удалить категорию #' + id + '?')) {
-                alert('Удаление категории #' + id);
+        // Category filter
+        document.getElementById('categoryFilter')?.addEventListener('change', function(e) {
+            const categoryId = e.target.value;
+            const cards = document.querySelectorAll('.product-card');
+
+            cards.forEach(card => {
+                if (!categoryId) {
+                    card.style.display = '';
+                } else {
+                    const cardCategory = card.dataset.category || '';
+                    card.style.display = cardCategory === categoryId ? '' : 'none';
+                }
+            });
+        });
+
+        // Sort functionality (simplified)
+        document.getElementById('sortFilter')?.addEventListener('change', function(e) {
+            const sort = e.target.value;
+            const grid = document.getElementById('productsGrid');
+            const cards = Array.from(grid.children);
+
+            cards.sort((a, b) => {
+                const priceA = parseInt(a.querySelector('.h5.fw-bold')?.textContent?.replace(/[^0-9]/g, '') || 0);
+                const priceB = parseInt(b.querySelector('.h5.fw-bold')?.textContent?.replace(/[^0-9]/g, '') || 0);
+
+                switch(sort) {
+                    case 'price_asc': return priceA - priceB;
+                    case 'price_desc': return priceB - priceA;
+                    default: return 0;
+                }
+            });
+
+            cards.forEach(card => grid.appendChild(card));
+        });
+
+        // Reset filters
+        document.getElementById('resetFilters')?.addEventListener('click', function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('sortFilter').value = 'newest';
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.style.display = '';
+            });
+        });
+
+        // View toggle
+        let isGridView = true;
+        document.getElementById('viewGrid')?.addEventListener('click', function() {
+            if (!isGridView) {
+                const grid = document.getElementById('productsGrid');
+                grid.className = 'row g-4';
+                grid.querySelectorAll('.product-card').forEach(card => {
+                    card.className = 'col-lg-3 col-md-4 col-sm-6 product-card';
+                });
+                isGridView = true;
             }
+        });
+
+        document.getElementById('viewList')?.addEventListener('click', function() {
+            if (isGridView) {
+                const grid = document.getElementById('productsGrid');
+                grid.className = 'row g-3';
+                grid.querySelectorAll('.product-card').forEach(card => {
+                    card.className = 'col-12 product-card';
+                });
+                isGridView = false;
+            }
+        });
+
+        // Quick View
+        function quickView(productId) {
+            // In real implementation, fetch product data via AJAX
+            const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+
+            // Demo data - replace with actual AJAX call
+            document.getElementById('quickViewImage').src = '{{ asset("storage/ps5i.webp") }}';
+            document.getElementById('quickViewName').textContent = 'Игровая консоль PlayStation 5';
+            document.getElementById('quickViewCategory').textContent = 'Игровые консоли';
+
+            // Demo tags
+            const tagsHtml = `
+                <span class="badge bg-primary rounded-pill px-2 py-1 me-1">
+                    <i class="bi bi-tag-fill me-1"></i> Игровая
+                </span>
+                <span class="badge bg-success rounded-pill px-2 py-1 me-1">
+                    <i class="bi bi-tag-fill me-1"></i> 4K
+                </span>
+                <span class="badge bg-warning text-dark rounded-pill px-2 py-1 me-1">
+                    <i class="bi bi-tag-fill me-1"></i> Новинка
+                </span>
+                <span class="badge bg-info rounded-pill px-2 py-1 me-1">
+                    <i class="bi bi-tag-fill me-1"></i> Беспроводная
+                </span>
+            `;
+            document.getElementById('quickViewTags').innerHTML = tagsHtml;
+
+            document.getElementById('quickViewDescription').textContent = 'Мощная игровая консоль нового поколения с поддержкой 4K и трассировкой лучей.';
+            document.getElementById('quickViewPrice').textContent = '49 990 ₽';
+            document.getElementById('quickViewOldPrice').textContent = '59 990 ₽';
+
+            modal.show();
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            // In real implementation, add to cart via AJAX
+            alert('Товар добавлен в корзину!');
+        }
+
+        function addToCartFromQuickView() {
+            alert('Товар добавлен в корзину!');
+            bootstrap.Modal.getInstance(document.getElementById('quickViewModal')).hide();
+        }
+
+        function resetFilters() {
+            document.getElementById('resetFilters')?.click();
         }
     </script>
-
 @endsection

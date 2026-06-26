@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Tag;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -13,6 +14,11 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
+        // Очищаем существующие данные (опционально)
+        // Category::query()->truncate();
+        // Product::query()->truncate();
+        // Tag::query()->truncate();
+
         $categories = [
             'Смартфоны' => [
                 'subcategories' => [
@@ -263,7 +269,7 @@ class CategorySeeder extends Seeder
                     'Видеокарты',
                     'Материнские платы',
                     'Оперативная память',
-                    'Блоки питания',
+                    'Блоки питания для пк',
                     'Системы охлаждения',
                     'Корпуса',
                     'SSD накопители',
@@ -277,20 +283,48 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $parentName => $data) {
-            // Создаем родительскую категорию
-            $parent = Category::query()->updateOrCreate(
+            // Создаем или находим родительскую категорию
+            $parent = Category::query()->firstOrCreate(
                 ['name' => $parentName],
                 ['is_active' => $data['is_active']]
             );
 
-            // Создаем сабкатегории
+            // Обновляем статус если нужно
+            if ($parent->is_active !== $data['is_active']) {
+                $parent->update(['is_active' => $data['is_active']]);
+            }
+
+            // Создаем подкатегории
             foreach ($data['subcategories'] as $subName) {
-                Category::factory([
+                // Проверяем существование подкатегории
+                $subCategory = Category::query()->where([
                     'name' => $subName,
                     'parent_id' => $parent->id,
-                ])
-                    ->has(Product::factory()->count(3), 'products')
-                    ->create();
+                ])->first();
+
+                if (!$subCategory) {
+                    // Создаем только если не существует
+                    $subCategory = Category::factory([
+                        'name' => $subName,
+                        'parent_id' => $parent->id,
+                        'is_active' => true,
+                    ])->create();
+
+                    // Создаем товары только для новых категорий
+                    Product::factory()
+                        ->count(3)
+                        ->for($subCategory)
+                        ->has(
+                            Tag::factory()->count(3),
+                            'tags'
+                        )
+                        ->create();
+                } else {
+                    // Обновляем статус если нужно
+                    if (!$subCategory->is_active) {
+                        $subCategory->update(['is_active' => true]);
+                    }
+                }
             }
         }
     }

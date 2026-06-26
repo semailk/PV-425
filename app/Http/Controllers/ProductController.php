@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -19,7 +20,7 @@ class ProductController extends Controller
         $sort = $request->get('sort', 'price');
         $arrayOrderBy = explode('_', $sort);
         $direction = last($arrayOrderBy) == 'asc' ? 'desc' : 'asc';
-        if (count($arrayOrderBy) > 1){
+        if (count($arrayOrderBy) > 1) {
             unset($arrayOrderBy[count($arrayOrderBy) - 1]);
         }
         $columnName = implode('_', $arrayOrderBy);
@@ -39,8 +40,9 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::where('is_active', true)->whereNotNull('parent_id')->get();
+        $tags = Tag::Active()->get();
 
-        return view('products.create', compact('categories'));
+        return view('products.create', compact('categories', 'tags'));
     }
 
     public function store(Request $request)
@@ -62,12 +64,13 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
-            Product::create($validated);
+            $product = Product::create($validated);
+            $product->tags()->attach($request->tags);
 
             DB::commit();
             return redirect()->route('products.index')
                 ->with('success', 'Продукт успешно создан!');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             Log::critical($exception->getMessage());
 
@@ -86,7 +89,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::where('is_active', true)->get();
-        return view('products.edit', compact('product', 'categories'));
+        $tags = Tag::Active()->get();
+        return view('products.edit',
+            compact('product', 'categories', 'tags'));
     }
 
     public function update(Request $request, Product $product)
@@ -111,9 +116,18 @@ class ProductController extends Controller
             $validated['image'] = 'storage/products/' . $imageName;
         }
 
-        $product->update($validated);
+        DB::beginTransaction();
+        try {
+            $product->update($validated);
+            $product->tags()->sync($request->tags);
+            DB::commit();
+        } catch (\Exception $exception) {
+            Log::critical($exception->getMessage());
+            DB::rollBack();
+            return redirect()->back();
+        }
 
-        return redirect()->route('products.index')
+        return redirect()->back()
             ->with('success', 'Продукт успешно обновлен!');
     }
 
