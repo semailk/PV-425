@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $description
  * @property string $image
  * @property numeric $price
+ * @property numeric $discount
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -49,11 +50,12 @@ class Product extends Model
     use HasFactory, SoftDeletes, ScopeFilters;
 
     protected $fillable = [
-      'category_id',
-      'name',
-      'description',
-      'price',
-      'image'
+        'category_id',
+        'name',
+        'description',
+        'price',
+        'image',
+        'discount',
     ];
 
     public function category(): belongsTo
@@ -69,7 +71,7 @@ class Product extends Model
         }
 
         // http://localhost:80000/storage/products/kmckwncknw12cm.jpg
-        return $this->attributes['image'];
+        return 'storage/products/' . $this->attributes['image'];
     }
 
     public function tags(): BelongsToMany

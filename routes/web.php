@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BasketController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
@@ -10,3 +11,5 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::resource('categories', CategoryController::class);
 
 Route::resource('products', ProductController::class);
+
+Route::get('basket', [BasketController::class, 'index'])->name('basket.index');
