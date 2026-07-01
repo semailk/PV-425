@@ -34,52 +34,147 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body p-4">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-5">
-                                <label class="form-label fw-semibold text-muted small text-uppercase">
-                                    <i class="bi bi-search me-1"></i> Поиск
-                                </label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-lg border-end-0"
-                                           placeholder="Найти товар..." id="searchInput">
-                                    <button class="btn btn-primary btn-lg" type="button">
-                                        <i class="bi bi-search"></i>
-                                    </button>
+                        <form action="{{ route('home') }}" method="GET" id="filterForm">
+                            <div class="row g-3 align-items-end">
+                                <!-- Поиск -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-muted small text-uppercase">
+                                        <i class="bi bi-search me-1"></i> Поиск
+                                    </label>
+                                    <div class="input-group">
+                                        <input name="search" type="text" class="form-control form-control-lg border-end-0"
+                                               value="{{ request()->input('search') }}" placeholder="Найти товар...">
+                                        <button class="btn btn-primary btn-lg" type="submit">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Категория -->
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-muted small text-uppercase">
+                                        <i class="bi bi-tag me-1"></i> Категория
+                                    </label>
+                                    <select name="category" class="form-select form-select-lg" onchange="this.form.submit()">
+                                        <option value="">Все категории</option>
+                                        @foreach($categories ?? [] as $category)
+                                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Цена от -->
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-muted small text-uppercase">
+                                        <i class="bi bi-currency-ruble me-1"></i> Цена от
+                                    </label>
+                                    <input name="price_from" type="number" class="form-control form-control-lg"
+                                           value="{{ request('price_from') }}" placeholder="0" min="0"
+                                           onchange="this.form.submit()">
+                                </div>
+
+                                <!-- Цена до -->
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-muted small text-uppercase">
+                                        <i class="bi bi-currency-ruble me-1"></i> Цена до
+                                    </label>
+                                    <input name="price_to" type="number" class="form-control form-control-lg"
+                                           value="{{ request('price_to') }}" placeholder="999999" min="0"
+                                           onchange="this.form.submit()">
+                                </div>
+
+                                <!-- Сортировка -->
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-muted small text-uppercase">
+                                        <i class="bi bi-arrow-up-down me-1"></i> Сортировка
+                                    </label>
+                                    <select name="sort" class="form-select form-select-lg" onchange="this.form.submit()">
+                                        <option value="created_at-asc" {{ request('sort') == 'created_at-desc' ? 'selected' : '' }}>Новинки</option>
+                                        <option value="price-asc" {{ request('sort') == 'price-asc' ? 'selected' : '' }}>Цена ↑</option>
+                                        <option value="price-desc" {{ request('sort') == 'price-desc' ? 'selected' : '' }}>Цена ↓</option>
+                                        <option value="created_at-asc" {{ request('sort') == 'created_at-asc' ? 'selected' : '' }}>Сначала старые</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted small text-uppercase">
-                                    <i class="bi bi-tag me-1"></i> Категория
-                                </label>
-                                <select class="form-select form-select-lg" id="categoryFilter">
-                                    <option value="">Все категории</option>
-                                    @foreach($categories ?? [] as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
+
+                            <!-- Дополнительная строка с кнопками -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="bi bi-funnel me-2"></i>
+                                            Применить фильтры
+                                        </button>
+                                        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="bi bi-arrow-counterclockwise me-2"></i>
+                                            Сбросить все
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label fw-semibold text-muted small text-uppercase">
-                                    <i class="bi bi-arrow-up-down me-1"></i> Сортировка
-                                </label>
-                                <select class="form-select form-select-lg" id="sortFilter">
-                                    <option value="newest">Новинки</option>
-                                    <option value="price_asc">Цена ↑</option>
-                                    <option value="price_desc">Цена ↓</option>
-                                    <option value="popular">Популярные</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <button class="btn btn-outline-secondary btn-lg w-100" type="button" id="resetFilters">
-                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
-                                    Сбросить
-                                </button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Active Filters -->
+        @if(request()->hasAny(['search', 'category', 'price_from', 'price_to', 'sort']))
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <span class="text-muted small">Активные фильтры:</span>
+                        @if(request('search'))
+                            <span class="badge bg-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-search me-1"></i> {{ request('search') }}
+                                <a href="{{ route('home', array_merge(request()->except(['search', 'page']))) }}" class="text-white text-decoration-none ms-1">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            </span>
+                        @endif
+                        @if(request('category'))
+                            @php
+                                $categoryName = $categories->firstWhere('id', request('category'))->name ?? 'Категория';
+                            @endphp
+                            <span class="badge bg-success rounded-pill px-3 py-2">
+                                <i class="bi bi-tag me-1"></i> {{ $categoryName }}
+                                <a href="{{ route('home', array_merge(request()->except(['category', 'page']))) }}" class="text-white text-decoration-none ms-1">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            </span>
+                        @endif
+                        @if(request('price_from') || request('price_to'))
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                <i class="bi bi-currency-ruble me-1"></i>
+                                {{ request('price_from') ? number_format(request('price_from'), 0, ',', ' ') : '0' }} ₽
+                                -
+                                {{ request('price_to') ? number_format(request('price_to'), 0, ',', ' ') : '∞' }} ₽
+                                <a href="{{ route('home', array_merge(request()->except(['price_from', 'price_to', 'page']))) }}" class="text-dark text-decoration-none ms-1">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            </span>
+                        @endif
+                        @if(request('sort') && request('sort') != 'newest')
+                            <span class="badge bg-info rounded-pill px-3 py-2">
+                                <i class="bi bi-arrow-up-down me-1"></i>
+                                @switch(request('sort'))
+                                    @case('price_asc') Цена ↑ @break
+                                    @case('price_desc') Цена ↓ @break
+                                    @case('popular') Популярные @break
+                                    @case('oldest') Сначала старые @break
+                                    @default Новинки
+                                @endswitch
+                                <a href="{{ route('home', array_merge(request()->except(['sort', 'page']))) }}" class="text-white text-decoration-none ms-1">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <!-- Products Grid -->
         <div class="row mb-4">
@@ -88,7 +183,7 @@
                     <h2 class="h4 fw-bold text-dark mb-0" id="products">
                         <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
                         Товары
-                        <span class="badge bg-primary rounded-pill ms-2">{{ count($products) }}</span>
+                        <span class="badge bg-primary rounded-pill ms-2">{{ $products->total() ?? count($products) }}</span>
                     </h2>
                     <div class="d-flex align-items-center gap-2">
                         <button class="btn btn-sm btn-outline-secondary rounded-3" id="viewGrid" title="Сетка">
@@ -106,8 +201,10 @@
             <!-- Products Grid View -->
             <div class="row g-4" id="productsGrid">
                 @foreach($products as $product)
-                    <div class="col-lg-3 col-md-4 col-sm-6 product-card" data-category="{{ $product->category_id }}">
-                        <div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
+                    <div class="col-lg-3 col-md-4 col-sm-6 product-card" data-category="{{ $product->category_id }}"
+                         data-price="{{ $product->price }}" data-created="{{ $product->created_at->timestamp }}">
+                        <div
+                            class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
                             <!-- Product Image -->
                             <div class="position-relative bg-light" style="height: 220px; overflow: hidden;">
                                 <img src="{{ asset($product->image) }}"
@@ -127,17 +224,23 @@
                                             <i class="bi bi-tags me-1"></i> Скидка
                                         </span>
                                     @endif
+                                    <span class="badge bg-info rounded-pill px-3 py-2 ms-1">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        {{ $product->created_at->format('d.m.Y') }}
+                                    </span>
                                 </div>
 
                                 <!-- Wishlist Button -->
-                                <button class="position-absolute top-0 end-0 m-2 btn btn-sm btn-white rounded-circle shadow-sm"
-                                        style="width: 36px; height: 36px; padding: 0;">
+                                <button
+                                    class="position-absolute top-0 end-0 m-2 btn btn-sm btn-white rounded-circle shadow-sm"
+                                    style="width: 36px; height: 36px; padding: 0;">
                                     <i class="bi bi-heart"></i>
                                 </button>
 
                                 <!-- Quick View Button -->
-                                <button class="position-absolute bottom-0 start-50 translate-middle-x mb-2 btn btn-dark btn-sm rounded-3 px-3 opacity-0-hover transition-all"
-                                        onclick="quickView({{ $product->id }})">
+                                <button
+                                    class="position-absolute bottom-0 start-50 translate-middle-x mb-2 btn btn-dark btn-sm rounded-3 px-3 opacity-0-hover transition-all"
+                                    onclick="quickView({{ $product->id }})">
                                     <i class="bi bi-eye me-1"></i> Быстрый просмотр
                                 </button>
                             </div>
@@ -203,6 +306,14 @@
                                         <i class="bi bi-cart-plus fs-5"></i>
                                     </button>
                                 </div>
+
+                                <!-- Дата создания -->
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        Добавлен: {{ $product->created_at->format('d.m.Y') }}
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -212,7 +323,7 @@
             <!-- Pagination -->
             @if(isset($products) && method_exists($products, 'links'))
                 <div class="mt-5 d-flex justify-content-center">
-                    {{ $products->links('pagination::bootstrap-5') }}
+                    {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             @endif
 
@@ -224,13 +335,12 @@
                 </div>
                 <h3 class="fw-bold text-dark mb-3">Товары не найдены</h3>
                 <p class="text-muted mx-auto" style="max-width: 400px;">
-                    В каталоге пока нет товаров. <br>
-                    Загляните позже или измените параметры поиска.
+                    Попробуйте изменить параметры поиска или сбросьте все фильтры.
                 </p>
-                <button onclick="resetFilters()" class="btn btn-primary btn-lg rounded-3 shadow-sm px-5 mt-3">
+                <a href="{{ route('home') }}" class="btn btn-primary btn-lg rounded-3 shadow-sm px-5 mt-3">
                     <i class="bi bi-arrow-counterclockwise me-2"></i>
-                    Сбросить фильтры
-                </button>
+                    Сбросить все фильтры
+                </a>
             </div>
         @endif
     </div>
@@ -265,8 +375,15 @@
                                 <span class="h2 fw-bold text-primary mb-0" id="quickViewPrice">0 ₽</span>
                                 <span class="text-muted text-decoration-line-through" id="quickViewOldPrice">0 ₽</span>
                             </div>
+                            <div class="mb-3">
+                                <small class="text-muted" id="quickViewDate">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    Добавлен:
+                                </small>
+                            </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-primary btn-lg flex-grow-1 rounded-3" onclick="addToCartFromQuickView()">
+                                <button class="btn btn-primary btn-lg flex-grow-1 rounded-3"
+                                        onclick="addToCartFromQuickView()">
                                     <i class="bi bi-cart-plus me-2"></i>
                                     Добавить в корзину
                                 </button>
@@ -297,7 +414,7 @@
 
         .hover-shadow:hover {
             transform: translateY(-8px);
-            box-shadow: 0 1.5rem 3rem rgba(0,0,0,.15) !important;
+            box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, .15) !important;
         }
 
         .transition-all {
@@ -421,72 +538,21 @@
             width: 3rem;
             height: 3rem;
         }
+
+        /* Price input styling */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
     </style>
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <script>
-        // Search functionality
-        document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.product-card');
-
-            cards.forEach(card => {
-                const name = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
-                card.style.display = name.includes(query) ? '' : 'none';
-            });
-        });
-
-        // Category filter
-        document.getElementById('categoryFilter')?.addEventListener('change', function(e) {
-            const categoryId = e.target.value;
-            const cards = document.querySelectorAll('.product-card');
-
-            cards.forEach(card => {
-                if (!categoryId) {
-                    card.style.display = '';
-                } else {
-                    const cardCategory = card.dataset.category || '';
-                    card.style.display = cardCategory === categoryId ? '' : 'none';
-                }
-            });
-        });
-
-        // Sort functionality (simplified)
-        document.getElementById('sortFilter')?.addEventListener('change', function(e) {
-            const sort = e.target.value;
-            const grid = document.getElementById('productsGrid');
-            const cards = Array.from(grid.children);
-
-            cards.sort((a, b) => {
-                const priceA = parseInt(a.querySelector('.h5.fw-bold')?.textContent?.replace(/[^0-9]/g, '') || 0);
-                const priceB = parseInt(b.querySelector('.h5.fw-bold')?.textContent?.replace(/[^0-9]/g, '') || 0);
-
-                switch(sort) {
-                    case 'price_asc': return priceA - priceB;
-                    case 'price_desc': return priceB - priceA;
-                    default: return 0;
-                }
-            });
-
-            cards.forEach(card => grid.appendChild(card));
-        });
-
-        // Reset filters
-        document.getElementById('resetFilters')?.addEventListener('click', function() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('sortFilter').value = 'newest';
-
-            document.querySelectorAll('.product-card').forEach(card => {
-                card.style.display = '';
-            });
-        });
-
         // View toggle
         let isGridView = true;
-        document.getElementById('viewGrid')?.addEventListener('click', function() {
+        document.getElementById('viewGrid')?.addEventListener('click', function () {
             if (!isGridView) {
                 const grid = document.getElementById('productsGrid');
                 grid.className = 'row g-4';
@@ -497,7 +563,7 @@
             }
         });
 
-        document.getElementById('viewList')?.addEventListener('click', function() {
+        document.getElementById('viewList')?.addEventListener('click', function () {
             if (isGridView) {
                 const grid = document.getElementById('productsGrid');
                 grid.className = 'row g-3';
@@ -538,6 +604,7 @@
             document.getElementById('quickViewDescription').textContent = 'Мощная игровая консоль нового поколения с поддержкой 4K и трассировкой лучей.';
             document.getElementById('quickViewPrice').textContent = '49 990 ₽';
             document.getElementById('quickViewOldPrice').textContent = '59 990 ₽';
+            document.getElementById('quickViewDate').textContent = 'Добавлен: 15.01.2024';
 
             modal.show();
         }
@@ -553,8 +620,20 @@
             bootstrap.Modal.getInstance(document.getElementById('quickViewModal')).hide();
         }
 
-        function resetFilters() {
-            document.getElementById('resetFilters')?.click();
-        }
+        // Автоматическая отправка формы при изменении фильтров
+        document.addEventListener('DOMContentLoaded', function() {
+            // Все select и input с атрибутом onchange="this.form.submit()" уже работают
+            // Добавляем debounce для поля поиска
+            const searchInput = document.querySelector('input[name="search"]');
+            if (searchInput) {
+                let timeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        this.form.submit();
+                    }, 500);
+                });
+            }
+        });
     </script>
 @endsection
