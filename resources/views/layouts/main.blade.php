@@ -336,120 +336,14 @@
     @stack('styles')
 </head>
 <body>
-<!-- Хедер -->
-<header class="header">
-    <div class="container">
-        <a href="/" class="header-logo">
-            <i class="fas fa-store"></i>
-            <span>ShopName</span>
-        </a>
-
-        <div class="header-search">
-            <form action="{{ route('products.index') }}" method="GET" id="searchForm">
-                <input
-                    type="text"
-                    id="searchInput"
-                    name="search"
-                    placeholder="Поиск товаров..."
-                    autocomplete="off"
-                    value="{{ request('search') }}"
-                >
-                <button type="submit" class="search-btn" title="Найти">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-            <div class="header-search-results" id="searchResults"></div>
-        </div>
-
-        <div class="header-actions">
-            <a href="{{ route('products.index') }}" class="header-btn">
-                <i class="fas fa-th-large"></i>
-                <span>Каталог</span>
-            </a>
-
-            <div style="position: relative;">
-                <button class="header-btn" id="cartToggle">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Корзина</span>
-                    <span class="cart-badge" id="cartCount">0</span>
-                </button>
-                <div class="header-cart-dropdown" id="cartDropdown">
-                    <div class="cart-empty">
-                        <i class="fas fa-shopping-bag"></i>
-                        <p>Корзина пуста</p>
-                    </div>
-                </div>
-            </div>
-
-            @auth
-                <div style="position: relative;">
-                    <button class="header-btn">
-                        <i class="fas fa-user"></i>
-                        <span>{{ Auth::user()->name }}</span>
-                    </button>
-                </div>
-            @else
-                <a href="#" class="header-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Войти</span>
-                </a>
-            @endauth
-        </div>
-    </div>
-</header>
+@include('components.header')
 
 <!-- Основной контент -->
 <main class="main-content">
     @yield('content')
 </main>
 
-<!-- Футер -->
-<footer class="footer">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <h5><i class="fas fa-store me-2"></i>ShopName</h5>
-                <p>Лучший интернет-магазин с широким ассортиментом товаров высокого качества.</p>
-                <div class="social-links mt-3">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-telegram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <h5>Информация</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#">О нас</a></li>
-                    <li><a href="#">Доставка</a></li>
-                    <li><a href="#">Оплата</a></li>
-                    <li><a href="#">Контакты</a></li>
-                </ul>
-            </div>
-            <div class="col-md-2">
-                <h5>Покупателям</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#">Возврат</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Отзывы</a></li>
-                    <li><a href="#">Блог</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Контакты</h5>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-phone me-2"></i> +7 (777) 123-45-67</li>
-                    <li><i class="fas fa-envelope me-2"></i> info@shopname.kz</li>
-                    <li><i class="fas fa-map-marker-alt me-2"></i> г. Алматы, ул. Абая 123</li>
-                </ul>
-            </div>
-        </div>
-        <hr class="border-secondary mt-4">
-        <div class="text-center">
-            <small>&copy; {{ date('Y') }} ShopName. Все права защищены.</small>
-        </div>
-    </div>
-</footer>
+@include('components.footer')
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
@@ -560,5 +454,6 @@
 </script>
 
 @stack('scripts')
+
 </body>
 </html>

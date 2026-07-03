@@ -91,10 +91,11 @@
                                         <i class="bi bi-arrow-up-down me-1"></i> Сортировка
                                     </label>
                                     <select name="sort" class="form-select form-select-lg" onchange="this.form.submit()">
-                                        <option value="created_at-asc" {{ request('sort') == 'created_at-desc' ? 'selected' : '' }}>Новинки</option>
-                                        <option value="price-asc" {{ request('sort') == 'price-asc' ? 'selected' : '' }}>Цена ↑</option>
-                                        <option value="price-desc" {{ request('sort') == 'price-desc' ? 'selected' : '' }}>Цена ↓</option>
-                                        <option value="created_at-asc" {{ request('sort') == 'created_at-asc' ? 'selected' : '' }}>Сначала старые</option>
+                                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Новинки</option>
+                                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Цена ↑</option>
+                                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Цена ↓</option>
+                                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Сначала старые</option>
+                                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Популярные</option>
                                     </select>
                                 </div>
                             </div>
@@ -203,8 +204,7 @@
                 @foreach($products as $product)
                     <div class="col-lg-3 col-md-4 col-sm-6 product-card" data-category="{{ $product->category_id }}"
                          data-price="{{ $product->price }}" data-created="{{ $product->created_at->timestamp }}">
-                        <div
-                            class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
                             <!-- Product Image -->
                             <div class="position-relative bg-light" style="height: 220px; overflow: hidden;">
                                 <img src="{{ asset($product->image) }}"
@@ -231,16 +231,14 @@
                                 </div>
 
                                 <!-- Wishlist Button -->
-                                <button
-                                    class="position-absolute top-0 end-0 m-2 btn btn-sm btn-white rounded-circle shadow-sm"
-                                    style="width: 36px; height: 36px; padding: 0;">
+                                <button class="position-absolute top-0 end-0 m-2 btn btn-sm btn-white rounded-circle shadow-sm"
+                                        style="width: 36px; height: 36px; padding: 0;" onclick="toggleWishlist({{ $product->id }})">
                                     <i class="bi bi-heart"></i>
                                 </button>
 
                                 <!-- Quick View Button -->
-                                <button
-                                    class="position-absolute bottom-0 start-50 translate-middle-x mb-2 btn btn-dark btn-sm rounded-3 px-3 opacity-0-hover transition-all"
-                                    onclick="quickView({{ $product->id }})">
+                                <button class="position-absolute bottom-0 start-50 translate-middle-x mb-2 btn btn-dark btn-sm rounded-3 px-3 opacity-0-hover transition-all"
+                                        onclick="quickView({{ $product->id }})">
                                     <i class="bi bi-eye me-1"></i> Быстрый просмотр
                                 </button>
                             </div>
@@ -364,11 +362,7 @@
                             </div>
 
                             <!-- Tags in Quick View -->
-                            <div class="mb-3" id="quickViewTags">
-                                <span class="badge bg-secondary rounded-pill px-2 py-1 me-1">
-                                    <i class="bi bi-tag-fill me-1"></i> Теги
-                                </span>
-                            </div>
+                            <div class="mb-3" id="quickViewTags"></div>
 
                             <p class="text-muted" id="quickViewDescription">Описание товара</p>
                             <div class="d-flex align-items-center gap-3 mb-3">
@@ -394,6 +388,16 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <div id="toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
     </div>
@@ -532,17 +536,28 @@
             }
         }
 
-        /* Loader */
-        .loading-spinner {
-            display: none;
-            width: 3rem;
-            height: 3rem;
+        /* Toast */
+        .toast {
+            background: #0d6efd;
         }
 
-        /* Price input styling */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            opacity: 1;
+        .toast-success {
+            background: #198754;
+        }
+
+        .toast-error {
+            background: #dc3545;
+        }
+
+        /* Cart badge animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .badge-pulse {
+            animation: pulse 0.3s ease;
         }
     </style>
 
@@ -550,6 +565,292 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <script>
+        // API Base URL
+        const API_URL = '/api';
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toast.className = `toast align-items-center text-white border-0 toast-${type}`;
+            toastMessage.textContent = message;
+
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+        // Обновленный getCart
+        async function getCart() {
+            try {
+                const response = await fetch(`${API_URL}/cart`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    updateCartUI(result.data);
+                }
+                return result.data || { items: [], total: 0, count: 0 };
+            } catch (error) {
+                console.error('Error fetching cart:', error);
+                return { items: [], total: 0, count: 0 };
+            }
+        }
+
+        // Обновленный addToCart
+        async function addToCart(productId) {
+            try {
+                const response = await fetch(`${API_URL}/cart/add/${productId}`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    updateCartUI(result.data);
+                    showToast('Товар добавлен в корзину!', 'success');
+                }
+
+                return result.data || { items: [], total: 0, count: 0 };
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Ошибка при добавлении товара', 'error');
+                return { items: [], total: 0, count: 0 };
+            }
+        }
+
+        // Обновленная функция обновления UI корзины
+        function updateCartUI(cartData) {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const headerCartBadge = document.querySelector('.header-actions__cart-badge');
+
+            // Получаем данные
+            const items = cartData.items || [];
+            const total = cartData.total || 0;
+            const count = cartData.count || 0;
+
+            // Обновляем бейджи
+            if (cartCount) {
+                cartCount.textContent = count;
+                if (count > 0) {
+                    cartCount.classList.add('badge-pulse');
+                    setTimeout(() => cartCount.classList.remove('badge-pulse'), 300);
+                }
+            }
+
+            if (headerCartBadge) {
+                headerCartBadge.textContent = count;
+            }
+
+            // Обновляем выпадающий список
+            if (cartItems) {
+                if (count === 0 || items.length === 0) {
+                    cartItems.innerHTML = `
+                <div class="cart-dropdown__empty">
+                    <i class="bi bi-cart-x fs-1 d-block mb-2" style="font-size: 2.5rem;"></i>
+                    <p class="mb-0">Корзина пуста</p>
+                </div>
+            `;
+                    return;
+                }
+
+                // Строим HTML для товаров в корзине
+                let html = '<div class="cart-dropdown__items-list">';
+
+                items.forEach(item => {
+                    const imageUrl = item.image ? `{{ asset('') }}${item.image}` : 'https://via.placeholder.com/60';
+
+                    html += `
+                <div class="cart-dropdown-item">
+                    <img src="${imageUrl}" alt="${item.name}" class="cart-dropdown-item__image" onerror="this.src='https://via.placeholder.com/60'">
+                    <div class="cart-dropdown-item__info">
+                        <div class="cart-dropdown-item__name">${item.name}</div>
+                        <div class="cart-dropdown-item__price">
+                            ${item.quantity} шт. × ${formatPrice(item.price)} = ${formatPrice(item.subtotal)}
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="cart-dropdown-item__remove">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+            `;
+                });
+
+                html += `
+                </div>
+                <div class="cart-dropdown__footer">
+                    <div class="cart-dropdown__total">
+                        <span>Итого:</span>
+                        <span>${formatPrice(total)}</span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="/cart" class="cart-dropdown__button">
+                            <i class="bi bi-cart me-2"></i>
+                            Перейти в корзину
+                        </a>
+                        <button onclick="clearCart()" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash me-2"></i>
+                            Очистить корзину
+                        </button>
+                    </div>
+                </div>
+            `;
+
+                cartItems.innerHTML = html;
+            }
+        }
+
+        // Обновленный removeFromCart
+        async function removeFromCart(productId) {
+            try {
+                const response = await fetch(`${API_URL}/cart/remove/${productId}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    updateCartUI(result.data);
+                    showToast('Товар удален из корзины', 'warning');
+                }
+
+                return result.data || { items: [], total: 0, count: 0 };
+            } catch (error) {
+                console.error('Error removing from cart:', error);
+                showToast('Ошибка при удалении товара', 'error');
+                return { items: [], total: 0, count: 0 };
+            }
+        }
+
+        // Обновленный clearCart
+        async function clearCart() {
+            if (!confirm('Вы уверены, что хотите очистить корзину?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/cart/clear`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    updateCartUI({ items: [], total: 0, count: 0 });
+                    showToast('Корзина очищена', 'warning');
+                }
+            } catch (error) {
+                console.error('Error clearing cart:', error);
+                showToast('Ошибка при очистке корзины', 'error');
+            }
+        }
+
+        // Format price
+        function formatPrice(price) {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency',
+                currency: 'RUB',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(price);
+        }
+
+        // Toggle wishlist
+        function toggleWishlist(productId) {
+            showToast('Добавлено в избранное', 'success');
+        }
+
+        // Quick View
+        function quickView(productId) {
+            const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+
+            // Fetch product data
+            fetch(`/api/product/${productId}`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const product = data.data;
+                        document.getElementById('quickViewImage').src = product.image || 'https://via.placeholder.com/400x400';
+                        document.getElementById('quickViewName').textContent = product.name;
+                        document.getElementById('quickViewCategory').textContent = product.category?.name || 'Без категории';
+
+                        // Tags
+                        let tagsHtml = '';
+                        if (product.tags && product.tags.length > 0) {
+                            product.tags.forEach(tag => {
+                                tagsHtml += `
+                                <span class="badge rounded-pill px-2 py-1 me-1" style="background: ${tag.color || '#6c757d'}; color: white;">
+                                    <i class="bi bi-tag-fill me-1"></i> ${tag.name}
+                                </span>
+                            `;
+                            });
+                        }
+                        document.getElementById('quickViewTags').innerHTML = tagsHtml || '<span class="text-muted small">Нет тегов</span>';
+
+                        document.getElementById('quickViewDescription').textContent = product.description || 'Описание отсутствует';
+                        document.getElementById('quickViewPrice').textContent = formatPrice(product.price);
+
+                        if (product.old_price) {
+                            document.getElementById('quickViewOldPrice').textContent = formatPrice(product.old_price);
+                            document.getElementById('quickViewOldPrice').style.display = 'inline';
+                        } else {
+                            document.getElementById('quickViewOldPrice').style.display = 'none';
+                        }
+
+                        document.getElementById('quickViewDate').textContent = `Добавлен: ${new Date(product.created_at).toLocaleDateString('ru-RU')}`;
+
+                        // Set product ID for add to cart button
+                        document.getElementById('quickViewProductId')?.setAttribute('data-product-id', product.id);
+
+                        modal.show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product:', error);
+                    showToast('Ошибка загрузки товара', 'error');
+                });
+        }
+
+        function addToCartFromQuickView() {
+            const productId = document.getElementById('quickViewProductId')?.getAttribute('data-product-id');
+            if (productId) {
+                addToCart(parseInt(productId));
+                bootstrap.Modal.getInstance(document.getElementById('quickViewModal'))?.hide();
+            }
+        }
+
         // View toggle
         let isGridView = true;
         document.getElementById('viewGrid')?.addEventListener('click', function () {
@@ -574,66 +875,129 @@
             }
         });
 
-        // Quick View
-        function quickView(productId) {
-            // In real implementation, fetch product data via AJAX
-            const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+        // Toggle cart dropdown
+        document.getElementById('cart-toggle')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdown = document.getElementById('cart-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
 
-            // Demo data - replace with actual AJAX call
-            document.getElementById('quickViewImage').src = '{{ asset("storage/ps5i.webp") }}';
-            document.getElementById('quickViewName').textContent = 'Игровая консоль PlayStation 5';
-            document.getElementById('quickViewCategory').textContent = 'Игровые консоли';
-
-            // Demo tags
-            const tagsHtml = `
-                <span class="badge bg-primary rounded-pill px-2 py-1 me-1">
-                    <i class="bi bi-tag-fill me-1"></i> Игровая
-                </span>
-                <span class="badge bg-success rounded-pill px-2 py-1 me-1">
-                    <i class="bi bi-tag-fill me-1"></i> 4K
-                </span>
-                <span class="badge bg-warning text-dark rounded-pill px-2 py-1 me-1">
-                    <i class="bi bi-tag-fill me-1"></i> Новинка
-                </span>
-                <span class="badge bg-info rounded-pill px-2 py-1 me-1">
-                    <i class="bi bi-tag-fill me-1"></i> Беспроводная
-                </span>
-            `;
-            document.getElementById('quickViewTags').innerHTML = tagsHtml;
-
-            document.getElementById('quickViewDescription').textContent = 'Мощная игровая консоль нового поколения с поддержкой 4K и трассировкой лучей.';
-            document.getElementById('quickViewPrice').textContent = '49 990 ₽';
-            document.getElementById('quickViewOldPrice').textContent = '59 990 ₽';
-            document.getElementById('quickViewDate').textContent = 'Добавлен: 15.01.2024';
-
-            modal.show();
-        }
-
-        // Add to cart
-        function addToCart(productId) {
-            // In real implementation, add to cart via AJAX
-            alert('Товар добавлен в корзину!');
-        }
-
-        function addToCartFromQuickView() {
-            alert('Товар добавлен в корзину!');
-            bootstrap.Modal.getInstance(document.getElementById('quickViewModal')).hide();
-        }
-
-        // Автоматическая отправка формы при изменении фильтров
-        document.addEventListener('DOMContentLoaded', function() {
-            // Все select и input с атрибутом onchange="this.form.submit()" уже работают
-            // Добавляем debounce для поля поиска
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                let timeout;
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => {
-                        this.form.submit();
-                    }, 500);
-                });
+        // Close cart dropdown on outside click
+        document.addEventListener('click', function(e) {
+            const cart = document.querySelector('.header-actions');
+            const dropdown = document.getElementById('cart-dropdown');
+            if (cart && !cart.contains(e.target)) {
+                dropdown.style.display = 'none';
             }
+        });
+
+        // Toggle catalog dropdown
+        document.getElementById('catalog-toggle')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdown = document.getElementById('catalog-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close catalog dropdown on outside click
+        document.addEventListener('click', function(e) {
+            const catalog = document.querySelector('.header-nav__item--catalog');
+            const dropdown = document.getElementById('catalog-dropdown');
+            if (catalog && !catalog.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Search with debounce
+        let searchTimeout;
+        document.getElementById('search-input')?.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value;
+            const resultsContainer = document.getElementById('search-results');
+
+            if (query.length < 2) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success' && data.data.length > 0) {
+                            let html = '';
+                            data.data.forEach(product => {
+                                html += `
+                                <a href="/product/${product.id}" class="search-result__item">
+                                    <img src="${product.image || 'https://via.placeholder.com/50'}" alt="${product.name}">
+                                    <div>
+                                        <div>${product.name}</div>
+                                        <div>${formatPrice(product.price)}</div>
+                                    </div>
+                                </a>
+                            `;
+                            });
+                            resultsContainer.innerHTML = html;
+                            resultsContainer.style.display = 'block';
+                        } else {
+                            resultsContainer.innerHTML = `
+                            <div class="search-result__empty">
+                                <i class="bi bi-search fs-3 d-block mb-2"></i>
+                                Ничего не найдено
+                            </div>
+                        `;
+                            resultsContainer.style.display = 'block';
+                        }
+                    })
+                    .catch(() => {
+                        resultsContainer.style.display = 'none';
+                    });
+            }, 300);
+        });
+
+        // Hide search results on outside click
+        document.addEventListener('click', function(e) {
+            const search = document.querySelector('.header-search');
+            const results = document.getElementById('search-results');
+            if (search && !search.contains(e.target)) {
+                results.style.display = 'none';
+            }
+        });
+
+        // Init cart on load
+        document.addEventListener('DOMContentLoaded', function() {
+            getCart();
+
+            // Add hidden product ID for quick view
+            const quickViewAddBtn = document.querySelector('#quickViewModal .btn-primary');
+            if (quickViewAddBtn) {
+                const hiddenId = document.createElement('input');
+                hiddenId.type = 'hidden';
+                hiddenId.id = 'quickViewProductId';
+                quickViewAddBtn.parentNode.appendChild(hiddenId);
+            }
+        });
+
+        // Auto-submit filter form on select change
+        document.querySelectorAll('select[onchange="this.form.submit()"], input[onchange="this.form.submit()"]').forEach(el => {
+            el.addEventListener('change', function() {
+                this.form.submit();
+            });
+        });
+
+        // Debounce for price inputs
+        let priceTimeout;
+        document.querySelectorAll('input[name="price_from"], input[name="price_to"]').forEach(el => {
+            el.addEventListener('input', function() {
+                clearTimeout(priceTimeout);
+                priceTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            });
         });
     </script>
 @endsection

@@ -1,130 +1,51 @@
-<!-- resources/views/layouts/partials/header.blade.php -->
+<!-- resources/views/components/header.blade.php -->
 <style>
-    /* Стили для header */
+    /* Стили для header - темная тема как в основном layout */
     .header {
-        background: #ffffff;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        background: #1a202c;
+        padding: 12px 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         position: sticky;
         top: 0;
         z-index: 1000;
     }
 
-    .header-top {
-        background: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
-        padding: 8px 0;
-        font-size: 14px;
-    }
-
-    .container {
+    .header .container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 15px;
-    }
-
-    .header-top__inner {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .header-top__info {
-        display: flex;
-        gap: 25px;
-        flex-wrap: wrap;
-    }
-
-    .header-top__item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #6c757d;
-    }
-
-    .header-top__item a {
-        color: #6c757d;
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-
-    .header-top__item a:hover {
-        color: #0d6efd;
-    }
-
-    .header-top__item i {
-        font-size: 14px;
-        color: #0d6efd;
-    }
-
-    .header-top__actions {
-        display: flex;
         gap: 20px;
-        align-items: center;
         flex-wrap: wrap;
     }
 
-    .header-top__link {
-        color: #6c757d;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .header-top__link:hover {
-        color: #0d6efd;
-    }
-
-    .header-top__link--register {
-        background: #0d6efd;
-        color: #fff;
-        padding: 4px 12px;
-        border-radius: 4px;
-    }
-
-    .header-top__link--register:hover {
-        background: #0b5ed7;
-        color: #fff;
-    }
-
-    .badge {
-        background: #dc3545;
-        color: #fff;
-        border-radius: 50%;
-        padding: 2px 7px;
-        font-size: 11px;
-        margin-left: 3px;
-    }
-
-    .header-main {
-        padding: 15px 0;
-    }
-
-    .header-main__inner {
-        display: flex;
-        align-items: center;
-        gap: 30px;
-        flex-wrap: wrap;
-    }
-
+    /* Логотип */
     .header-logo {
-        flex: 0 0 200px;
-    }
-
-    .header-logo__link {
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
+        text-decoration: none;
         display: flex;
         align-items: center;
         gap: 10px;
-        text-decoration: none;
-        color: #212529;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    .header-logo:hover {
+        color: #63b3ed;
+    }
+
+    .header-logo i {
+        color: #63b3ed;
+        font-size: 28px;
     }
 
     .header-logo__img {
-        height: 40px;
         width: 40px;
+        height: 40px;
         background: #0d6efd;
         border-radius: 8px;
         display: flex;
@@ -133,44 +54,52 @@
         color: #fff;
         font-weight: 700;
         font-size: 20px;
+        flex-shrink: 0;
     }
 
     .header-logo__text {
         font-size: 24px;
         font-weight: 700;
-        color: #0d6efd;
+        color: #63b3ed;
     }
 
+    /* Поиск */
     .header-search {
         flex: 1;
-        max-width: 600px;
+        max-width: 500px;
         position: relative;
+        min-width: 200px;
     }
 
     .header-search__form {
+        display: flex;
+        position: relative;
         width: 100%;
     }
 
     .header-search__wrapper {
         display: flex;
-        border: 2px solid #0d6efd;
-        border-radius: 8px;
+        width: 100%;
+        border-radius: 10px;
         overflow: hidden;
-        background: #fff;
+        background: #2d3748;
     }
 
     .header-search__category {
         padding: 10px 15px;
         border: none;
-        background: #f8f9fa;
+        background: #2d3748;
+        color: #a0aec0;
         font-size: 14px;
         cursor: pointer;
         outline: none;
-        min-width: 150px;
+        min-width: 140px;
+        transition: background 0.3s;
     }
 
+    .header-search__category:hover,
     .header-search__category:focus {
-        background: #fff;
+        background: #374151;
     }
 
     .header-search__input {
@@ -178,85 +107,112 @@
         padding: 10px 15px;
         border: none;
         outline: none;
-        font-size: 16px;
+        background: #2d3748;
+        color: #fff;
+        font-size: 14px;
+        min-width: 100px;
+    }
+
+    .header-search__input::placeholder {
+        color: #a0aec0;
     }
 
     .header-search__input:focus {
-        box-shadow: none;
+        background: #374151;
     }
 
     .header-search__button {
-        padding: 10px 20px;
-        background: #0d6efd;
-        color: #fff;
+        padding: 10px 18px;
+        background: transparent;
+        color: #a0aec0;
         border: none;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: color 0.3s;
+        font-size: 16px;
     }
 
     .header-search__button:hover {
-        background: #0b5ed7;
+        color: #63b3ed;
     }
 
     .header-search__results {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 8px);
         left: 0;
         right: 0;
         background: #fff;
-        border: 1px solid #e9ecef;
-        border-radius: 0 0 8px 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        margin-top: 2px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        display: none;
         max-height: 400px;
         overflow-y: auto;
+        padding: 8px 0;
         z-index: 1001;
-        display: none;
     }
 
     .search-result__item {
         display: flex;
         align-items: center;
-        gap: 15px;
-        padding: 12px 15px;
+        gap: 12px;
+        padding: 10px 16px;
         text-decoration: none;
-        color: #212529;
-        border-bottom: 1px solid #f1f3f5;
-        transition: background 0.3s;
+        color: #1a202c;
+        transition: background 0.2s ease;
+        border-bottom: 1px solid #f7fafc;
+    }
+
+    .search-result__item:last-child {
+        border-bottom: none;
     }
 
     .search-result__item:hover {
-        background: #f8f9fa;
+        background: #f7fafc;
     }
 
     .search-result__item img {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         object-fit: cover;
-        border-radius: 4px;
-        background: #e9ecef;
+        border-radius: 8px;
+        background: #f7fafc;
+        flex-shrink: 0;
     }
 
-    .search-result__item div {
+    .search-result__item .info {
         flex: 1;
     }
 
-    .search-result__item div div:first-child {
+    .search-result__item .name {
         font-weight: 500;
+        font-size: 14px;
+        color: #1a202c;
     }
 
-    .search-result__item div div:last-child {
-        font-size: 14px;
-        color: #0d6efd;
+    .search-result__item .price {
+        font-size: 13px;
+        color: #2b6cb0;
         font-weight: 600;
+    }
+
+    .search-result__item .category {
+        font-size: 11px;
+        color: #a0aec0;
     }
 
     .search-result__empty {
         padding: 30px;
         text-align: center;
-        color: #6c757d;
+        color: #718096;
     }
 
+    .search-result__empty i {
+        font-size: 24px;
+        display: block;
+        margin-bottom: 8px;
+        color: #a0aec0;
+    }
+
+    /* Корзина */
     .header-actions {
         flex: 0 0 auto;
         position: relative;
@@ -266,69 +222,96 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px 20px;
-        background: #0d6efd;
-        color: #fff;
-        border-radius: 8px;
-        text-decoration: none;
-        transition: background 0.3s;
+        padding: 8px 16px;
+        background: transparent;
+        color: #e2e8f0;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
         font-weight: 500;
+        font-size: 14px;
         position: relative;
+        text-decoration: none;
     }
 
     .header-actions__cart:hover {
-        background: #0b5ed7;
+        background: #2d3748;
         color: #fff;
     }
 
     .header-actions__cart i {
-        font-size: 24px;
+        font-size: 20px;
+        color: #63b3ed;
+    }
+
+    .header-actions__cart-text {
+        color: #e2e8f0;
     }
 
     .header-actions__cart-badge {
-        background: #dc3545;
+        background: #e53e3e;
         color: #fff;
-        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 700;
         padding: 2px 8px;
-        font-size: 12px;
+        border-radius: 20px;
         margin-left: 5px;
+        min-width: 20px;
+        text-align: center;
     }
 
     .header-cart-dropdown {
         position: absolute;
-        top: calc(100% + 10px);
+        top: calc(100% + 8px);
         right: 0;
-        width: 380px;
         background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        z-index: 1001;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        min-width: 340px;
+        padding: 16px;
         display: none;
-    }
-
-    .header-cart-dropdown__inner {
-        padding: 20px;
+        z-index: 1001;
     }
 
     .header-cart-dropdown__items {
-        max-height: 300px;
+        max-height: 320px;
         overflow-y: auto;
+    }
+
+    .header-cart-dropdown__items::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .header-cart-dropdown__items::-webkit-scrollbar-track {
+        background: #f7fafc;
+        border-radius: 4px;
+    }
+
+    .header-cart-dropdown__items::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 4px;
     }
 
     .cart-dropdown-item {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 12px;
         padding: 10px 0;
-        border-bottom: 1px solid #f1f3f5;
+        border-bottom: 1px solid #f7fafc;
+    }
+
+    .cart-dropdown-item:last-child {
+        border-bottom: none;
     }
 
     .cart-dropdown-item__image {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         object-fit: cover;
-        border-radius: 4px;
-        background: #e9ecef;
+        border-radius: 8px;
+        background: #f7fafc;
+        flex-shrink: 0;
     }
 
     .cart-dropdown-item__info {
@@ -337,23 +320,26 @@
 
     .cart-dropdown-item__name {
         font-weight: 500;
-        margin-bottom: 4px;
+        font-size: 14px;
+        color: #1a202c;
+        margin-bottom: 2px;
     }
 
     .cart-dropdown-item__price {
-        font-size: 14px;
-        color: #0d6efd;
+        font-size: 13px;
+        color: #2b6cb0;
         font-weight: 600;
     }
 
     .cart-dropdown-item__remove {
         background: none;
         border: none;
-        color: #dc3545;
+        color: #e53e3e;
         cursor: pointer;
-        font-size: 18px;
-        padding: 5px;
+        font-size: 16px;
+        padding: 4px 8px;
         transition: transform 0.3s;
+        flex-shrink: 0;
     }
 
     .cart-dropdown-item__remove:hover {
@@ -361,44 +347,61 @@
     }
 
     .cart-dropdown__empty {
-        padding: 30px;
         text-align: center;
-        color: #6c757d;
+        padding: 20px 0;
+        color: #718096;
+    }
+
+    .cart-dropdown__empty i {
+        font-size: 36px;
+        color: #e2e8f0;
+        display: block;
+        margin-bottom: 10px;
     }
 
     .cart-dropdown__footer {
-        padding-top: 15px;
-        border-top: 2px solid #f1f3f5;
+        padding-top: 12px;
+        border-top: 2px solid #f7fafc;
+        margin-top: 8px;
     }
 
     .cart-dropdown__total {
         display: flex;
         justify-content: space-between;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
-        margin-bottom: 15px;
+        color: #1a202c;
+        margin-bottom: 12px;
     }
 
     .cart-dropdown__button {
         display: block;
-        padding: 12px;
-        background: #0d6efd;
+        padding: 10px;
+        background: #2b6cb0;
         color: #fff;
         text-align: center;
-        border-radius: 6px;
+        border-radius: 8px;
         text-decoration: none;
         font-weight: 500;
         transition: background 0.3s;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        font-size: 14px;
     }
 
     .cart-dropdown__button:hover {
-        background: #0b5ed7;
+        background: #1a4f7a;
         color: #fff;
     }
 
+    /* Меню навигации */
     .header-nav {
-        background: #f8f9fa;
-        border-top: 1px solid #e9ecef;
+        background: transparent;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        margin-top: 8px;
+        padding-top: 8px;
+        width: 100%;
     }
 
     .header-nav__list {
@@ -420,53 +423,57 @@
 
     .header-nav__link {
         display: block;
-        padding: 12px 20px;
-        color: #212529;
+        padding: 8px 16px;
+        color: #e2e8f0;
         text-decoration: none;
         font-weight: 500;
-        font-size: 15px;
+        font-size: 14px;
         transition: all 0.3s;
-        border-radius: 4px;
+        border-radius: 8px;
     }
 
     .header-nav__link i {
-        margin-right: 8px;
+        margin-right: 6px;
     }
 
     .header-nav__link:hover,
     .header-nav__link.active {
-        background: #0d6efd;
+        background: #2d3748;
         color: #fff;
     }
 
     .header-nav__catalog-toggle {
-        padding: 12px 20px;
-        background: #0d6efd;
-        color: #fff;
+        padding: 8px 16px;
+        background: #2d3748;
+        color: #e2e8f0;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
         font-weight: 500;
-        font-size: 15px;
-        transition: background 0.3s;
+        font-size: 14px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .header-nav__catalog-toggle:hover {
-        background: #0b5ed7;
+        background: #374151;
+        color: #fff;
     }
 
     .header-nav__catalog-toggle i {
-        margin-right: 8px;
+        color: #63b3ed;
     }
 
     .header-nav__dropdown {
         position: absolute;
         top: 100%;
         left: 0;
-        min-width: 260px;
+        min-width: 240px;
         background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         padding: 8px 0;
         list-style: none;
         display: none;
@@ -485,60 +492,67 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 20px;
-        color: #212529;
+        padding: 10px 16px;
+        color: #1a202c;
         text-decoration: none;
         transition: background 0.3s;
+        font-size: 14px;
     }
 
     .header-nav__dropdown-link:hover {
-        background: #f8f9fa;
+        background: #f7fafc;
     }
 
     .header-nav__dropdown-link i {
         margin-right: 10px;
-        width: 20px;
-        color: #0d6efd;
+        width: 18px;
+        color: #2b6cb0;
+        text-align: center;
     }
 
     .header-nav__subdropdown {
         position: absolute;
         top: 0;
         left: 100%;
-        min-width: 220px;
+        min-width: 200px;
         background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         padding: 8px 0;
         list-style: none;
         display: none;
+        z-index: 1000;
     }
 
     .header-nav__subdropdown li a {
         display: block;
-        padding: 10px 20px;
-        color: #212529;
+        padding: 10px 16px;
+        color: #1a202c;
         text-decoration: none;
         transition: background 0.3s;
+        font-size: 14px;
     }
 
     .header-nav__subdropdown li a:hover {
-        background: #f8f9fa;
+        background: #f7fafc;
     }
 
-    /* Медиа-запросы для мобильных устройств */
+    /* Анимация бейджа */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); }
+    }
+
+    .badge-pulse {
+        animation: pulse 0.3s ease;
+    }
+
+    /* Адаптивность */
     @media (max-width: 991px) {
-        .header-top__info {
-            display: none;
-        }
-
-        .header-main__inner {
+        .header .container {
             flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .header-logo {
-            flex: 0 0 auto;
+            gap: 12px;
         }
 
         .header-search {
@@ -551,9 +565,14 @@
             display: none;
         }
 
+        .header-actions__cart {
+            padding: 8px 12px;
+        }
+
         .header-nav__list {
             overflow-x: auto;
             flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
         }
 
         .header-nav__list .header-nav__item--catalog {
@@ -562,143 +581,129 @@
 
         .header-nav__link {
             white-space: nowrap;
-            padding: 10px 15px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .header-nav__catalog-toggle {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .header-cart-dropdown {
+            min-width: 300px;
+            right: -20px;
         }
     }
 
     @media (max-width: 576px) {
-        .header-top__actions {
+        .header-logo {
+            font-size: 20px;
+        }
+
+        .header-logo__text {
+            font-size: 20px;
+        }
+
+        .header-logo__img {
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+        }
+
+        .header-search__category {
+            min-width: 100px;
             font-size: 12px;
+            padding: 8px 10px;
         }
 
-        .header-top__actions .header-top__link {
-            gap: 3px;
+        .header-search__input {
+            font-size: 13px;
+            padding: 8px 10px;
         }
 
-        .header-actions__cart {
+        .header-search__button {
             padding: 8px 12px;
         }
 
         .header-actions__cart i {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .header-cart-dropdown {
-            width: 300px;
-            right: -50px;
+            min-width: 280px;
+            right: -40px;
+            padding: 12px;
+        }
+
+        .header-nav__link {
+            font-size: 12px;
+            padding: 4px 10px;
         }
     }
 </style>
 
 <header class="header">
-    <!-- Верхняя строка с контактами -->
-    <div class="header-top">
-        <div class="container">
-            <div class="header-top__inner">
-                <div class="header-top__info">
-                    <span class="header-top__item">
-                        <i class="fas fa-phone"></i>
-                        <a href="tel:+78001234567">8 (800) 123-45-67</a>
-                    </span>
-                    <span class="header-top__item">
-                        <i class="fas fa-envelope"></i>
-                        <a href="mailto:info@shop.ru">info@shop.ru</a>
-                    </span>
-                    <span class="header-top__item">
-                        <i class="fas fa-clock"></i>
-                        Ежедневно с 9:00 до 21:00
-                    </span>
+    <div class="container">
+        <!-- Логотип -->
+        <a href="{{ route('home') }}" class="header-logo">
+            <div class="header-logo__img">S</div>
+            <span class="header-logo__text">ShopName</span>
+        </a>
+
+        <!-- Поиск -->
+        <div class="header-search">
+            <form action="#" method="GET" class="header-search__form" id="search-form">
+                <div class="header-search__wrapper">
+                    <select name="category" class="header-search__category" aria-label="Категория">
+                        <option value="">Все категории</option>
+                        <option value="1">Электроника</option>
+                        <option value="2">Одежда</option>
+                        <option value="3">Дом и сад</option>
+                        <option value="4">Красота</option>
+                        <option value="5">Спорт</option>
+                    </select>
+                    <input
+                        type="text"
+                        name="query"
+                        class="header-search__input"
+                        placeholder="Поиск товаров..."
+                        value=""
+                        autocomplete="off"
+                        id="search-input"
+                    >
+                    <button type="submit" class="header-search__button">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
-                <div class="header-top__actions">
-                    <a href="#" class="header-top__link">
-                        <i class="fas fa-exchange-alt"></i> Сравнение
-                    </a>
-                    <a href="#" class="header-top__link">
-                        <i class="fas fa-heart"></i> Избранное
-                        <span class="badge">0</span>
-                    </a>
-                    <a href="#" class="header-top__link">
-                        <i class="fas fa-user"></i> Войти
-                    </a>
-                    <a href="#" class="header-top__link header-top__link--register">
-                        Регистрация
-                    </a>
-                </div>
-            </div>
+                <div id="search-results" class="header-search__results"></div>
+            </form>
         </div>
-    </div>
 
-    <!-- Основная часть с логотипом и поиском -->
-    <div class="header-main">
-        <div class="container">
-            <div class="header-main__inner">
-                <!-- Логотип -->
-                <div class="header-logo">
-                    <a href="#" class="header-logo__link">
-                        <div class="header-logo__img">S</div>
-                        <span class="header-logo__text">ShopName</span>
-                    </a>
-                </div>
+        <!-- Корзина -->
+        <div class="header-actions">
+            <button class="header-actions__cart" id="cart-toggle">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="header-actions__cart-text">Корзина</span>
+                <span class="header-actions__cart-badge" id="cart-count">0</span>
+            </button>
 
-                <!-- Поиск -->
-                <div class="header-search">
-                    <form action="#" method="GET" class="header-search__form" id="search-form">
-                        <div class="header-search__wrapper">
-                            <select name="category" class="header-search__category" aria-label="Категория">
-                                <option value="">Все категории</option>
-                                <option value="1">Электроника</option>
-                                <option value="2">Одежда</option>
-                                <option value="3">Дом и сад</option>
-                                <option value="4">Красота</option>
-                                <option value="5">Спорт</option>
-                            </select>
-                            <input
-                                type="text"
-                                name="query"
-                                class="header-search__input"
-                                placeholder="Поиск товаров..."
-                                value=""
-                                autocomplete="off"
-                                id="search-input"
-                            >
-                            <button type="submit" class="header-search__button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                        <!-- Выпадающий список результатов поиска -->
-                        <div id="search-results" class="header-search__results"></div>
-                    </form>
-                </div>
-
-                <!-- Корзина -->
-                <div class="header-actions">
-                    <a href="#" class="header-actions__cart" id="cart-toggle">
+            <div class="header-cart-dropdown" id="cart-dropdown">
+                <div class="header-cart-dropdown__items" id="cart-items">
+                    <div class="cart-dropdown__empty">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="header-actions__cart-text">Корзина</span>
-                        <span class="header-actions__cart-badge" id="cart-count">0</span>
-                    </a>
-
-                    <!-- Мини-корзина при наведении -->
-                    <div class="header-cart-dropdown" id="cart-dropdown">
-                        <div class="header-cart-dropdown__inner">
-                            <div class="header-cart-dropdown__items" id="cart-items">
-                                <div class="cart-dropdown__empty">Корзина пуста</div>
-                            </div>
-                        </div>
+                        Корзина пуста
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Меню навигации -->
-    <nav class="header-nav">
-        <div class="container">
+        <!-- Навигация -->
+        <nav class="header-nav">
             <ul class="header-nav__list">
                 <li class="header-nav__item header-nav__item--catalog">
                     <button class="header-nav__catalog-toggle" id="catalog-toggle">
-                        <i class="fas fa-bars"></i> Каталог товаров
+                        <i class="fas fa-bars"></i> Каталог
                     </button>
                     <ul class="header-nav__dropdown" id="catalog-dropdown">
                         <li class="header-nav__dropdown-item">
@@ -731,12 +736,12 @@
                         </li>
                         <li class="header-nav__dropdown-item">
                             <a href="#" class="header-nav__dropdown-link">
-                                <i class="fas fa-heart"></i> Красота и здоровье
+                                <i class="fas fa-heart"></i> Красота
                             </a>
                         </li>
                         <li class="header-nav__dropdown-item">
                             <a href="#" class="header-nav__dropdown-link">
-                                <i class="fas fa-running"></i> Спорт и отдых
+                                <i class="fas fa-running"></i> Спорт
                             </a>
                         </li>
                         <li class="header-nav__dropdown-item">
@@ -748,13 +753,13 @@
                 </li>
 
                 <li class="header-nav__item">
-                    <a href="#" class="header-nav__link active">
+                    <a href="{{ route('home') }}" class="header-nav__link active">
                         <i class="fas fa-home"></i> Главная
                     </a>
                 </li>
                 <li class="header-nav__item">
                     <a href="#" class="header-nav__link">
-                        <i class="fas fa-box"></i> Все товары
+                        <i class="fas fa-box"></i> Товары
                     </a>
                 </li>
                 <li class="header-nav__item">
@@ -773,6 +778,6 @@
                     </a>
                 </li>
             </ul>
-        </div>
-    </nav>
+        </nav>
+    </div>
 </header>
