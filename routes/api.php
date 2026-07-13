@@ -1,17 +1,17 @@
 <?php
 
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\ProductController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Маршруты корзины
-Route::get('/cart', [CartController::class, 'getCart']);
+Route::get('/cart', [CartController::class, 'getCart'])->name('api.cart.get');
 Route::post('/cart/add/{product}', [CartController::class, 'addToCart']);
 Route::delete('/cart/remove/{product}', [CartController::class, 'removeFromCart']);
 Route::put('/cart/update/{product}', [CartController::class, 'updateQuantity']);
 Route::delete('/cart/clear', [CartController::class, 'clearCart']);
-
 // Поиск товаров
 Route::get('/search', function (Request $request) {
     $query = $request->get('q');

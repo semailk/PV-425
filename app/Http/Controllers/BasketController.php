@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class BasketController extends Controller
 {
     public function index()
     {
-//        Session::put('test', 123);
-        dd(Session::get('test'));
+        return view('checkout.index');
     }
 }

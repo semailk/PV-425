@@ -699,7 +699,7 @@
                         <span>${formatPrice(total)}</span>
                     </div>
                     <div class="d-grid gap-2">
-                        <a href="/cart" class="cart-dropdown__button">
+                        <a href="{{ route('basket.index') }}" class="cart-dropdown__button">
                             <i class="bi bi-cart me-2"></i>
                             Перейти в корзину
                         </a>
