@@ -312,7 +312,7 @@ class CategorySeeder extends Seeder
 
                     // Создаем товары только для новых категорий
                     Product::factory()
-                        ->count(3)
+                        ->count(100)
                         ->for($subCategory)
                         ->has(
                             Tag::factory()->count(3),

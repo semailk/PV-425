@@ -215,6 +215,9 @@
     /* Корзина */
     .header-actions {
         flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
         position: relative;
     }
 
@@ -261,6 +264,182 @@
         text-align: center;
     }
 
+    /* Профиль пользователя */
+    .header-user {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .header-user__button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: transparent;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #e2e8f0;
+        text-decoration: none;
+    }
+
+    .header-user__button:hover {
+        background: #2d3748;
+        color: #fff;
+    }
+
+    .header-user__avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .header-user__avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .header-user__name {
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        color: #e2e8f0;
+    }
+
+    .header-user__dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 220px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        padding: 8px 0;
+        display: none;
+        z-index: 1001;
+    }
+
+    .header-user__dropdown.active {
+        display: block;
+    }
+
+    .header-user__dropdown-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f7fafc;
+        margin-bottom: 4px;
+    }
+
+    .header-user__dropdown-header .name {
+        font-weight: 600;
+        color: #1a202c;
+        font-size: 14px;
+    }
+
+    .header-user__dropdown-header .email {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 2px;
+    }
+
+    .header-user__dropdown-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        color: #1a202c;
+        text-decoration: none;
+        transition: background 0.3s ease;
+        font-size: 14px;
+        border: none;
+        background: none;
+        width: 100%;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .header-user__dropdown-link:hover {
+        background: #f7fafc;
+    }
+
+    .header-user__dropdown-link i {
+        width: 18px;
+        color: #2b6cb0;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .header-user__dropdown-link.danger {
+        color: #e53e3e;
+    }
+
+    .header-user__dropdown-link.danger i {
+        color: #e53e3e;
+    }
+
+    .header-user__dropdown-divider {
+        height: 1px;
+        background: #f7fafc;
+        margin: 4px 0;
+    }
+
+    /* Гостевые кнопки */
+    .header-guest {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .header-guest__btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .header-guest__btn--login {
+        background: transparent;
+        color: #e2e8f0;
+        border: 1px solid #4a5568;
+    }
+
+    .header-guest__btn--login:hover {
+        background: #2d3748;
+        color: #fff;
+        border-color: #63b3ed;
+    }
+
+    .header-guest__btn--register {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border: none;
+    }
+
+    .header-guest__btn--register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: #fff;
+    }
+
+    /* Корзина дропдаун */
     .header-cart-dropdown {
         position: absolute;
         top: calc(100% + 8px);
@@ -272,6 +451,10 @@
         padding: 16px;
         display: none;
         z-index: 1001;
+    }
+
+    .header-cart-dropdown.active {
+        display: block;
     }
 
     .header-cart-dropdown__items {
@@ -480,6 +663,10 @@
         z-index: 1000;
     }
 
+    .header-nav__dropdown.active {
+        display: block;
+    }
+
     .header-nav__dropdown-item {
         position: relative;
     }
@@ -569,6 +756,22 @@
             padding: 8px 12px;
         }
 
+        .header-user__name {
+            display: none;
+        }
+
+        .header-user__button {
+            padding: 6px 10px;
+        }
+
+        .header-guest__btn span {
+            display: none;
+        }
+
+        .header-guest__btn {
+            padding: 6px 10px;
+        }
+
         .header-nav__list {
             overflow-x: auto;
             flex-wrap: nowrap;
@@ -593,6 +796,10 @@
         .header-cart-dropdown {
             min-width: 300px;
             right: -20px;
+        }
+
+        .header-user__dropdown {
+            right: -10px;
         }
     }
 
@@ -640,6 +847,11 @@
             font-size: 12px;
             padding: 4px 10px;
         }
+
+        .header-guest__btn {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
     }
 </style>
 
@@ -680,14 +892,75 @@
             </form>
         </div>
 
-        <!-- Корзина -->
+        <!-- Правая часть: корзина + профиль -->
         <div class="header-actions">
+            <!-- Корзина -->
             <button class="header-actions__cart" id="cart-toggle">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="header-actions__cart-text">Корзина</span>
                 <span class="header-actions__cart-badge" id="cart-count">0</span>
             </button>
 
+            <!-- Профиль пользователя / Гость -->
+            @auth
+                <!-- Авторизованный пользователь -->
+                <div class="header-user">
+                    <button class="header-user__button" id="user-dropdown-toggle">
+                        <div class="header-user__avatar">
+                            @if(Auth::user()->avatar)
+                                <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
+                            @else
+                                {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                            @endif
+                        </div>
+                        <span class="header-user__name">{{ Auth::user()->name }}</span>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #718096;"></i>
+                    </button>
+
+                    <div class="header-user__dropdown" id="user-dropdown">
+                        <div class="header-user__dropdown-header">
+                            <div class="name">{{ Auth::user()->name }}</div>
+                            <div class="email">{{ Auth::user()->email }}</div>
+                        </div>
+
+                        <a href="{{ route('profile') }}" class="header-user__dropdown-link">
+                            <i class="fas fa-user"></i> Мой профиль
+                        </a>
+                        <a href="{{ route('profile.orders') }}" class="header-user__dropdown-link">
+                            <i class="fas fa-shopping-bag"></i> Мои заказы
+                        </a>
+                        <a href="{{ route('profile.wishlist') }}" class="header-user__dropdown-link">
+                            <i class="fas fa-heart"></i> Избранное
+                        </a>
+                        <a href="{{ route('profile.settings') }}" class="header-user__dropdown-link">
+                            <i class="fas fa-cog"></i> Настройки
+                        </a>
+
+                        <div class="header-user__dropdown-divider"></div>
+
+                        <form method="POST" action="{{ route('logout') }}" style="width: 100%;">
+                            @csrf
+                            <button type="submit" class="header-user__dropdown-link danger">
+                                <i class="fas fa-sign-out-alt"></i> Выйти
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @else
+                <!-- Гость -->
+                <div class="header-guest">
+                    <a href="{{ route('login') }}" class="header-guest__btn header-guest__btn--login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Вход</span>
+                    </a>
+                    <a href="{{ route('register') }}" class="header-guest__btn header-guest__btn--register">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Регистрация</span>
+                    </a>
+                </div>
+            @endauth
+
+            <!-- Корзина дропдаун -->
             <div class="header-cart-dropdown" id="cart-dropdown">
                 <div class="header-cart-dropdown__items" id="cart-items">
                     <div class="cart-dropdown__empty">
@@ -781,3 +1054,63 @@
         </nav>
     </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle user dropdown
+        const userToggle = document.getElementById('user-dropdown-toggle');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        if (userToggle && userDropdown) {
+            userToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+                // Close other dropdowns
+                document.getElementById('cart-dropdown').classList.remove('active');
+                document.getElementById('catalog-dropdown').classList.remove('active');
+            });
+        }
+
+        // Toggle cart dropdown
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartDropdown = document.getElementById('cart-dropdown');
+
+        if (cartToggle && cartDropdown) {
+            cartToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                cartDropdown.classList.toggle('active');
+                // Close other dropdowns
+                userDropdown?.classList.remove('active');
+                document.getElementById('catalog-dropdown').classList.remove('active');
+            });
+        }
+
+        // Toggle catalog dropdown
+        const catalogToggle = document.getElementById('catalog-toggle');
+        const catalogDropdown = document.getElementById('catalog-dropdown');
+
+        if (catalogToggle && catalogDropdown) {
+            catalogToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                catalogDropdown.classList.toggle('active');
+                // Close other dropdowns
+                userDropdown?.classList.remove('active');
+                cartDropdown.classList.remove('active');
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            userDropdown?.classList.remove('active');
+            cartDropdown.classList.remove('active');
+            catalogDropdown.classList.remove('active');
+        });
+
+        // Prevent closing when clicking inside dropdowns
+        document.querySelectorAll('.header-user__dropdown, .header-cart-dropdown, .header-nav__dropdown').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    });
+</script>
