@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserWelcomeMail;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use function PHPSTORM_META\map;
 
 class WelcomeController extends Controller
 {
     public function index(Request $request): View
     {
+        User::query()->get()->map(function (User $user) {
+            \Mail::to($user)->queue(new UserWelcomeMail($user));
+        });
+
         $query = Product::query()->with([
             'category',
             'tags'
