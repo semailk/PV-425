@@ -31,4 +31,17 @@ class AuthTest extends TestCase
         $this->assertEquals($name, $user->name);
         $this->assertTrue(\Hash::check($password, $user->password));
     }
+
+    public function test_login(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertAuthenticated();
+    }
 }
