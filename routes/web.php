@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
@@ -32,3 +33,16 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::post('/set-locale', function (Request $request) {
+    $locale = $request->input('locale');
+    $allowed = ['ru', 'en'];
+
+    if (in_array($locale, $allowed)) {
+        \Illuminate\Support\Facades\Session::put('locale', $locale);
+        app()->setLocale($locale);
+        return response()->json(['success' => true]);
+    }
+
+    return response()->json(['success' => false], 400);
+})->name('set-locale');

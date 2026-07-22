@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\ProductController;
 use App\Models\Product;
@@ -7,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Маршруты корзины
-Route::get('/cart', [CartController::class, 'getCart'])->name('api.cart.get');
+Route::get('/cart', [CartController::class, 'getCart'])->name('api.cart.get')->middleware('auth:api');
 Route::post('/cart/add/{product}', [CartController::class, 'addToCart']);
 Route::delete('/cart/remove/{product}', [CartController::class, 'removeFromCart']);
 Route::put('/cart/update/{product}', [CartController::class, 'updateQuantity']);
@@ -56,4 +57,14 @@ Route::get('/product/{product}', function (Product $product) {
             'created_at' => $product->created_at
         ]
     ]);
+});
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+], function ($router) {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('me', [AuthController::class, 'me']);
 });

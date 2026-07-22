@@ -1,4 +1,5 @@
 <!-- resources/views/components/header.blade.php -->
+
 <style>
     /* Стили для header - темная тема как в основном layout */
     .header {
@@ -217,7 +218,7 @@
         flex: 0 0 auto;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
         position: relative;
     }
 
@@ -262,6 +263,116 @@
         margin-left: 5px;
         min-width: 20px;
         text-align: center;
+    }
+
+    /* ========== СТИЛИ ДЛЯ СЕЛЕКТОРА ЯЗЫКА ========== */
+    .header-language {
+        position: relative;
+        flex: 0 0 auto;
+    }
+
+    .header-language__button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        background: transparent;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #e2e8f0;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .header-language__button:hover {
+        background: #2d3748;
+        color: #fff;
+    }
+
+    .header-language__button .flag {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .header-language__button .lang-code {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #a0aec0;
+    }
+
+    .header-language__button .arrow {
+        font-size: 10px;
+        color: #718096;
+        transition: transform 0.3s;
+    }
+
+    .header-language__button.active .arrow {
+        transform: rotate(180deg);
+    }
+
+    .header-language__dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 180px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        padding: 6px 0;
+        display: none;
+        z-index: 1001;
+        overflow: hidden;
+    }
+
+    .header-language__dropdown.active {
+        display: block;
+    }
+
+    .header-language__option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        color: #1a202c;
+        text-decoration: none;
+        transition: background 0.3s ease;
+        font-size: 14px;
+        border: none;
+        background: none;
+        width: 100%;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .header-language__option:hover {
+        background: #f7fafc;
+    }
+
+    .header-language__option.active {
+        background: #ebf4ff;
+        color: #2b6cb0;
+        font-weight: 600;
+    }
+
+    .header-language__option .flag {
+        font-size: 20px;
+    }
+
+    .header-language__option .lang-name {
+        flex: 1;
+    }
+
+    .header-language__option .check {
+        color: #2b6cb0;
+        font-size: 14px;
+        display: none;
+    }
+
+    .header-language__option.active .check {
+        display: inline;
     }
 
     /* Профиль пользователя */
@@ -772,6 +883,14 @@
             padding: 6px 10px;
         }
 
+        .header-language__button .lang-code {
+            display: none;
+        }
+
+        .header-language__button {
+            padding: 6px 8px;
+        }
+
         .header-nav__list {
             overflow-x: auto;
             flex-wrap: nowrap;
@@ -799,6 +918,10 @@
         }
 
         .header-user__dropdown {
+            right: -10px;
+        }
+
+        .header-language__dropdown {
             right: -10px;
         }
     }
@@ -833,8 +956,24 @@
             padding: 8px 12px;
         }
 
+        .header-actions {
+            gap: 4px;
+        }
+
         .header-actions__cart i {
             font-size: 18px;
+        }
+
+        .header-actions__cart {
+            padding: 6px 8px;
+        }
+
+        .header-language__button .flag {
+            font-size: 16px;
+        }
+
+        .header-language__button {
+            padding: 6px 6px;
         }
 
         .header-cart-dropdown {
@@ -852,8 +991,19 @@
             font-size: 12px;
             padding: 4px 8px;
         }
+
+        .header-language__dropdown {
+            min-width: 160px;
+            right: -20px;
+        }
+
+        .header-language__option {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
     }
 </style>
+<!-- resources/views/components/header.blade.php -->
 
 <header class="header">
     <div class="container">
@@ -892,10 +1042,45 @@
             </form>
         </div>
 
-        <!-- Правая часть: корзина + профиль -->
+        <!-- Правая часть: язык + корзина + профиль -->
         <div class="header-actions">
+            <!-- ========== СЕЛЕКТОР ЯЗЫКА ========== -->
+            @php
+                $locales = [
+                    'ru' => ['flag' => '🇷🇺', 'name' => 'Русский', 'code' => 'RU'],
+                    'en' => ['flag' => '🇬🇧', 'name' => 'English', 'code' => 'EN'],
+                ];
+                $currentLocale = app()->getLocale();
+                // Получаем данные текущего языка
+                $currentLocaleData = $locales[$currentLocale] ?? $locales['ru'];
+            @endphp
+
+            <div class="header-language">
+                <button class="header-language__button" id="language-toggle" type="button">
+                    <span class="flag">{{ $currentLocaleData['flag'] }}</span>
+                    <span class="lang-code">{{ $currentLocaleData['code'] }}</span>
+                    <span class="arrow">▼</span>
+                </button>
+
+                <div class="header-language__dropdown" id="language-dropdown">
+                    @foreach($locales as $locale => $data)
+                        <button
+                            class="header-language__option {{ $locale === $currentLocale ? 'active' : '' }}"
+                            data-locale="{{ $locale }}"
+                            data-flag="{{ $data['flag'] }}"
+                            data-code="{{ $data['code'] }}"
+                            type="button"
+                        >
+                            <span class="flag">{{ $data['flag'] }}</span>
+                            <span class="lang-name">{{ $data['name'] }}</span>
+                            <span class="check">✓</span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
             <!-- Корзина -->
-            <button class="header-actions__cart" id="cart-toggle">
+            <button class="header-actions__cart" id="cart-toggle" type="button">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="header-actions__cart-text">Корзина</span>
                 <span class="header-actions__cart-badge" id="cart-count">0</span>
@@ -905,7 +1090,7 @@
             @auth
                 <!-- Авторизованный пользователь -->
                 <div class="header-user">
-                    <button class="header-user__button" id="user-dropdown-toggle">
+                    <button class="header-user__button" id="user-dropdown-toggle" type="button">
                         <div class="header-user__avatar">
                             @if(Auth::user()->avatar)
                                 <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
@@ -975,8 +1160,8 @@
         <nav class="header-nav">
             <ul class="header-nav__list">
                 <li class="header-nav__item header-nav__item--catalog">
-                    <button class="header-nav__catalog-toggle" id="catalog-toggle">
-                        <i class="fas fa-bars"></i> Каталог
+                    <button class="header-nav__catalog-toggle" id="catalog-toggle" type="button">
+                        <i class="fas fa-bars"></i> @lang('header.catalog')
                     </button>
                     <ul class="header-nav__dropdown" id="catalog-dropdown">
                         <li class="header-nav__dropdown-item">
@@ -1027,12 +1212,12 @@
 
                 <li class="header-nav__item">
                     <a href="{{ route('home') }}" class="header-nav__link active">
-                        <i class="fas fa-home"></i> Главная
+                        <i class="fas fa-home"></i> @lang('header.main')
                     </a>
                 </li>
                 <li class="header-nav__item">
                     <a href="#" class="header-nav__link">
-                        <i class="fas fa-box"></i> Товары
+                        <i class="fas fa-box"></i> @lang('header.product')
                     </a>
                 </li>
                 <li class="header-nav__item">
@@ -1057,7 +1242,82 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Toggle user dropdown
+        // ========== ЯЗЫКОВОЙ СЕЛЕКТОР ==========
+        const langToggle = document.getElementById('language-toggle');
+        const langDropdown = document.getElementById('language-dropdown');
+        const langOptions = document.querySelectorAll('.header-language__option');
+        const currentFlag = document.getElementById('current-flag');
+        const currentLangCode = document.getElementById('current-lang-code');
+
+        // Обновление активного языка в интерфейсе
+        function updateActiveLanguage(locale) {
+            langOptions.forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.locale === locale) {
+                    option.classList.add('active');
+                    // Обновляем флаг и код в кнопке
+                    if (currentFlag) {
+                        currentFlag.textContent = option.dataset.flag;
+                    }
+                    if (currentLangCode) {
+                        currentLangCode.textContent = option.dataset.code;
+                    }
+                }
+            });
+        }
+
+        // Функция переключения языка
+        function switchLanguage(locale) {
+            // Отправляем запрос на сервер для смены языка
+            fetch('{{ route("set-locale") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ locale: locale })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Обновляем интерфейс
+                        updateActiveLanguage(locale);
+                        // Перезагружаем страницу для применения переводов
+                        location.reload();
+                    }
+                })
+                .catch(() => {
+                    // Fallback: перезагрузка с параметром
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('lang', locale);
+                    window.location.href = url.toString();
+                });
+        }
+
+        // Toggle языкового дропдауна
+        if (langToggle && langDropdown) {
+            langToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                langDropdown.classList.toggle('active');
+                langToggle.classList.toggle('active');
+
+                // Закрываем другие дропдауны
+                document.getElementById('user-dropdown')?.classList.remove('active');
+                document.getElementById('cart-dropdown')?.classList.remove('active');
+                document.getElementById('catalog-dropdown')?.classList.remove('active');
+            });
+        }
+
+        // Выбор языка
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const locale = this.dataset.locale;
+                switchLanguage(locale);
+            });
+        });
+
+        // ========== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ==========
         const userToggle = document.getElementById('user-dropdown-toggle');
         const userDropdown = document.getElementById('user-dropdown');
 
@@ -1065,13 +1325,16 @@
             userToggle.addEventListener('click', function(e) {
                 e.stopPropagation();
                 userDropdown.classList.toggle('active');
-                // Close other dropdowns
-                document.getElementById('cart-dropdown').classList.remove('active');
-                document.getElementById('catalog-dropdown').classList.remove('active');
+
+                // Закрываем другие дропдауны
+                document.getElementById('cart-dropdown')?.classList.remove('active');
+                document.getElementById('catalog-dropdown')?.classList.remove('active');
+                langDropdown?.classList.remove('active');
+                langToggle?.classList.remove('active');
             });
         }
 
-        // Toggle cart dropdown
+        // ========== КОРЗИНА ==========
         const cartToggle = document.getElementById('cart-toggle');
         const cartDropdown = document.getElementById('cart-dropdown');
 
@@ -1079,13 +1342,16 @@
             cartToggle.addEventListener('click', function(e) {
                 e.stopPropagation();
                 cartDropdown.classList.toggle('active');
-                // Close other dropdowns
+
+                // Закрываем другие дропдауны
                 userDropdown?.classList.remove('active');
-                document.getElementById('catalog-dropdown').classList.remove('active');
+                document.getElementById('catalog-dropdown')?.classList.remove('active');
+                langDropdown?.classList.remove('active');
+                langToggle?.classList.remove('active');
             });
         }
 
-        // Toggle catalog dropdown
+        // ========== КАТАЛОГ ==========
         const catalogToggle = document.getElementById('catalog-toggle');
         const catalogDropdown = document.getElementById('catalog-dropdown');
 
@@ -1093,21 +1359,31 @@
             catalogToggle.addEventListener('click', function(e) {
                 e.stopPropagation();
                 catalogDropdown.classList.toggle('active');
-                // Close other dropdowns
+
+                // Закрываем другие дропдауны
                 userDropdown?.classList.remove('active');
-                cartDropdown.classList.remove('active');
+                cartDropdown?.classList.remove('active');
+                langDropdown?.classList.remove('active');
+                langToggle?.classList.remove('active');
             });
         }
 
-        // Close dropdowns when clicking outside
+        // ========== ЗАКРЫТИЕ ПРИ КЛИКЕ СНАРУЖИ ==========
         document.addEventListener('click', function() {
             userDropdown?.classList.remove('active');
-            cartDropdown.classList.remove('active');
-            catalogDropdown.classList.remove('active');
+            cartDropdown?.classList.remove('active');
+            catalogDropdown?.classList.remove('active');
+            langDropdown?.classList.remove('active');
+            langToggle?.classList.remove('active');
         });
 
-        // Prevent closing when clicking inside dropdowns
-        document.querySelectorAll('.header-user__dropdown, .header-cart-dropdown, .header-nav__dropdown').forEach(function(el) {
+        // ========== ПРЕДОТВРАЩЕНИЕ ЗАКРЫТИЯ ПРИ КЛИКЕ ВНУТРИ ==========
+        document.querySelectorAll(
+            '.header-user__dropdown, ' +
+            '.header-cart-dropdown, ' +
+            '.header-nav__dropdown, ' +
+            '.header-language__dropdown'
+        ).forEach(function(el) {
             el.addEventListener('click', function(e) {
                 e.stopPropagation();
             });
