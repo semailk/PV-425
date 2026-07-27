@@ -24,7 +24,7 @@ class WelcomeController extends Controller
 
         $categories = Category::query()->orderBy('name')->get();
 
-        list($column, $direction) = explode('-', $request->input('sort', 'created_at-desc'));
+        list($column, $direction) = explode('-', 'created_at-desc');
 
         if ($request->input('search')) {
             $query->where('name', 'like', '%' . $request->input('search') . '%')

@@ -81,9 +81,22 @@ class ProductController extends Controller
         }
     }
 
-    public function show(Product $product)
+    public function show(int $product)
     {
-        return view('products.show', compact('product'));
+        if (\Cache::has('product_' . $product)) {
+            $product = (object)\Cache::get('product_' . $product);
+        }else{
+            $product = Product::find($product);
+            \Cache::put('product_' . $product->id, $product->load(['tags', 'category'])->toArray());
+        }
+        $categories = Category::where('is_active', true)->get();
+        $tags = Tag::Active()->get();
+
+        return view('products.show', [
+            'product' => $product,
+            'categories' => $categories,
+            'tags' => $tags
+        ]);
     }
 
     public function edit(Product $product)
@@ -120,6 +133,7 @@ class ProductController extends Controller
         try {
             $product->update($validated);
             $product->tags()->sync($request->tags);
+            \Cache::put('product_' . $product->id, $product->load(['tags', 'category'])->toArray());
             DB::commit();
         } catch (\Exception $exception) {
             Log::critical($exception->getMessage());
@@ -138,6 +152,9 @@ class ProductController extends Controller
 //            unlink(public_path($product->image));
 //        }
 
+        if(\Cache::has('product_' . $product->id)) {
+            \Cache::forget('product_' . $product->id);
+        }
         $product->delete();
 
         return redirect()->route('products.index')
