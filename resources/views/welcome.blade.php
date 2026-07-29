@@ -207,7 +207,7 @@
                         <div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
                             <!-- Product Image -->
                             <div class="position-relative bg-light" style="height: 220px; overflow: hidden;">
-                                <img src="{{ asset($product->image) }}"
+                                <img src="{{ asset('storage/' . $product->image) }}"
                                      alt="{{ $product->name }}"
                                      class="img-fluid w-100 h-100 object-fit-cover transition-all"
                                      style="object-fit: cover;">

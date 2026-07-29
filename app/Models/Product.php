@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use App\Traits\ScopeFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +48,7 @@ use Illuminate\Support\Carbon;
  */
 class Product extends Model
 {
+    use CrudTrait;
     use HasFactory, SoftDeletes, ScopeFilters;
 
     protected $fillable = [
@@ -71,7 +73,7 @@ class Product extends Model
         }
 
         // http://localhost:80000/storage/products/kmckwncknw12cm.jpg
-        return 'storage/products/' . $this->attributes['image'];
+        return  $this->attributes['image'];
     }
 
     public function tags(): BelongsToMany

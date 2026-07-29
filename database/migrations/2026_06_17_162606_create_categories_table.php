@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('parent_id')->nullable();
+            $table->string('photo')->default('products/category.webp');
 
             $table->string('name')->unique();
             $table->boolean('is_active')->default(true);

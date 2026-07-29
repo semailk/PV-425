@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $parent_id
  * @property string $name
  * @property int $is_active
+ * @property string $photo
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $children
@@ -36,11 +39,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Category extends Model
 {
+    use CrudTrait;
     use HasUuids, HasFactory;
     protected $fillable = [
         'name',
         'is_active',
         'parent_id',
+        'photo'
     ];
 
     public function children(): HasMany
@@ -48,9 +53,9 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function parent(): HasOne
+    public function parent(): BelongsTo
     {
-        return $this->hasOne(Category::class, 'id', 'parent_id');
+        return $this->belongsTo(Category::class, 'parent_id');
     }
 
     public function products(): HasMany

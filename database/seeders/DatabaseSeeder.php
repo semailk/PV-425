@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CategorySeeder::class,
+            UserSeeder::class,
         ]);
 
         if (!User::query()->where('email','test@example.com')->exists()) {
